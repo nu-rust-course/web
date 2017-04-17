@@ -1,0 +1,398 @@
+% vim: ts=2
+\documentclass{beamer}
+
+\usepackage{solarslides}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{frame}
+\thispagestyle{empty}\centering
+\ti{\alert{Mutual Exclusion}}
+\hd{EECS 3/495 “Rust”}
+\hd{Spring 2017}
+\end{frame}
+
+\begin{frame}[fragile]{A counter class}{}
+  ««
+  |K:class |D‹Counter›
+  {
+  |K‹public›:
+  	|+|T:int get_and_inc()
+    {
+    	|+|T:int old = count_;
+      count_ = old + |L1;
+      |K:return old; |-
+    } |-
+
+  |K‹private›:
+  	|T:int count_ = |L0;
+  };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{A problem}{}
+««
+|T:Counter c;
+
+|T:std::thread t1([|K&]() { c.get_and_inc(); });
+|T:std::thread t2([|K&]() { c.get_and_inc(); });
+
+t1.join();
+t2.join();
+
+|M‹CHECK_EQUAL›(|L2, c.get_and_inc());
+»»
+\end{frame}
+
+\begin{frame}[fragile]{Solution: A lock (a/k/a mutex)}{}
+  ««
+  |K‹class› |D‹ILock›
+  {
+  	|+|K:virtual |T:void unlock() |==|kill%
+    |K:virtual |T:void lock() |> |Q‹= 0›;
+    |K:virtual |T:void unlock() |> |Q‹= 0›; |-
+  };
+  |pause
+  |K‹class› |D‹Lock› : |K‹public› |D‹ILock› { |ensuremath|cdots };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Using a lock}{}
+  ««
+  |K:class |D‹Counter›
+  {
+  |K‹public›:
+  	|+|T:int get_and_inc()
+    {
+    	|+lock_.lock();
+      |T:int old = count_;
+      count_ = old + |L1;
+      lock_.unlock();
+      |K:return old; |-
+    } |-
+
+  |K‹private›:
+  	|T:int count_ = |L0;
+  	|T:Lock lock_;
+  };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{RAII: Resource Acquisition Is Initialization}{}
+  ««
+  |K:class |D‹Lock_guard›
+  {
+  |K‹public›:
+  	|+Lock_guard(|T‹ILock› |K& lock) : lock_(lock)
+    {
+    	lock_.lock();
+    }
+
+    |ensuremath|sim Lock_guard()
+    {
+    	lock_.unlock();
+    } |-
+
+  |K‹private›:
+  	|T‹ILock› |K& lock_;
+  };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Using a lock—RAII-style}{}
+  ««
+  |K:class |D‹Counter›
+  {
+  |K‹public›:
+  	|+|T:int get_and_inc()
+    {
+    	|+|T:Lock_guard guard(lock_);
+      |T:int old = count_;
+      count_ = old + |L1;
+      |K:return old; |-
+    } |-
+
+  |K‹private›:
+  	|T:int count_ = |L0;
+  	|T:Lock lock_;
+  };
+  »»
+\end{frame}
+
+\begin{frame}{How to implement the lock?}{}
+  Two-thread solutions first, then $n$-thread solutions
+\end{frame}
+
+\begin{frame}[fragile]{Base class for two-thread lock}{}
+  ««
+  |K:class |D:Lock_base : |K:public |D‹ILock›
+  {
+  	|+|C‹// i() is this thread:›
+    |T:thread::id i() |T‹const›
+    {
+    	|K:return |D‹this_thread›::get_id();
+    }
+
+    |C‹// j() is the other thread:›
+    |T:thread::id j() |T‹const›
+    {
+    	|K:return i().other_thread();
+    } |-
+  };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{An attempt}{}
+  ««
+  |K‹class› |D‹Lock_one› : |K‹public› |D‹Lock_base›
+  {
+  	|T‹bool› flag_|T‹[2]› = {};
+
+  |K‹public›:
+  	|+|K:virtual |T:void lock() |Q‹override›
+    {
+    	|+flag_[i()] = |L‹true›;
+      |K:while (flag_[j()]) {} |-
+    }
+
+    |K:virtual |T:void unlock() |Q‹override› {} |-
+  };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Theorem}{}
+  «|D‹Lock_one›» satisfies mutual exclusion.
+  \pause \alert{Proof by contradiction:}
+
+  \begin{itemize}
+    \item Assume CS$_A$ overlaps CS$_B$
+    \pause
+    \item Consider each thread’s last read and write in \emph{lock}() before
+      entering its CS. For $A$ to enter, it first writes true to its flag,
+      and then needs to read false from the other’s:
+      \begin{itemize}
+        \item write$_A$(flag[$A$] = true) $\to$ read$_A$(flag[$B$] == false) $\to$ CS$_A$
+      \end{itemize}
+      \pause
+      And by symmetry:
+      \begin{itemize}
+        \item write$_B$(flag[$B$] = true) $\to$ read$_B$(flag[$A$] == false) $\to$ CS$_B$
+      \end{itemize}
+    \pause
+    \item Note, also, that if $A$ sees $B$’s flag as false, that must happen
+      before $B$ writes its flag, and by symmetry for $B$ seeing $A$’s flag:
+      \begin{itemize}
+        \item read$_A$(flag[$B$] == false) $\to$ write$_B$(flag[$B$] = true)
+        \item read$_B$(flag[$A$] == false) $\to$ write$_A$(flag[$A$] = true)
+      \end{itemize}
+      \pause
+      These events form a cycle, which is a contradiction.\hfill\qed
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Two other properties}{}
+  Deadlock-free:
+  \begin{itemize}
+    \item One ill-behaved thread does not prevent other threads from
+      locking other locks
+    \item System as a whole makes progress
+    \item<2> Does \textT{Lock\_one} enjoy deadlock freedom?
+  \end{itemize}
+   Starvation-free
+  \begin{itemize}
+    \item Every locking thread eventually returns
+    \item Every thread makes progress
+    \item<2> Does \textT{Lock\_one} enjoy starvation freedom?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Deadlock case for Lock\_one}{}
+  ««
+  flag_[0] = |L‹true›;
+  |hspace‹.45|linewidth› |=flag_[1] = |L‹true›;
+  |K:while (flag_[1]) {}
+                         |>|K:while (flag_[0]) {}
+  »»
+  \bigskip
+(But sequentially it's fine.)
+\end{frame}
+
+\begin{frame}[fragile]{Another attempt}{}
+  ««
+  |K‹class› |D‹Lock_two› : |K‹public› |D‹Lock_base›
+  {
+  	|T‹int› waiting_;
+
+  |K‹public›:
+  	|+|K:virtual |T:void lock() |Q‹override›
+    {
+    	|+waiting_ = i();
+      |K:while (waiting_ == i()) {} |-
+    }
+
+    |K:virtual |T:void unlock() |Q‹override› {} |-
+  };
+  »»
+\end{frame}
+
+\begin{frame}{Lock\_two claims}{}
+  \begin{itemize}
+    \item Satisfies mutual exclusion
+    \item Non deadlock-free
+      \begin{itemize}
+        \item Sequential execution deadlocks
+        \item Concurrent execution does not
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Peterson's algorithm}{}
+  ««
+  |K‹class› |D‹Peterson_lock› : |K‹public› |D‹Lock_base›
+  {
+  	|T‹bool› flag_|T‹[2]› = {};
+  	|T‹int› waiting_;
+
+  |K‹public›:
+  	|+|K:virtual |T:void lock() |Q‹override›
+    {
+    	|+flag_[i()] = |L‹true›;
+      waiting_ = i();
+      |K:while (flag_[j()] |K‹&&› waiting_ == i()) {} |-
+    }
+
+    |K:virtual |T:void unlock() |Q‹override›
+    { flag_[i()] = |L‹false›; } |-
+  };
+  »»
+\end{frame}
+
+\begin{frame}{Peterson's lock properties}
+  \begin{itemize}
+    \item Mutual exclusion
+      \begin{itemize}
+        \item By contradiction\ldots
+      \end{itemize}
+    \item Deadlock freedom
+      \begin{itemize}
+        \item Only one thread at a time can be waiting
+      \end{itemize}
+    \item Starvation freedom
+      \begin{itemize}
+        \item If A finishes and tries to re-enter while B is waiting, B gets
+          in first
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Filter algorithm for $n$ threads}{}
+  ««
+  |K‹template› <|T‹int› N>
+  |K‹class› |D‹Filter_lock› : |K‹public› |D‹Lock_base›
+  {
+  	|+|kill%
+    |T‹int› level_|T‹[N]› = {};
+    |T‹int› waiting_|T‹[N]›;
+
+    |T:bool exists_competition(|T:int level)
+    {
+    	|+|kill%
+      |K:for (|T:auto k : |D‹thread›::all_ids())
+      	|K:if (k != i() |K‹&&› level_[k] >= level)
+      		|K‹return› |L‹true›;
+      |K:return |L‹false›; |-
+    }
+    $|vdots$ |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{}{}
+  ««
+  |K‹template› <|T‹int› N>
+  |K‹class› |D‹Filter_lock› : |K‹public› |D‹Lock_base›
+  {
+  $|vdots$
+  |K‹public›:
+  	|+|kill%
+    |K‹virtual› |T‹void› lock() |Q‹override›
+    {
+    	|+|kill%
+      |K‹for› (|T:int level = |L1; level < N; ++level) {
+      	|+|kill%
+        waiting_[level] |==|kill%
+        level_[i()] |> = level;
+        waiting_[level] = i();
+        |K:while (|=exists_competition(level) |K‹&&›
+                  |>waiting_[level] == i()) {} |-
+      } |-
+    }
+    
+    |K‹virtual› |T:void unlock() |Q‹override›
+    { level_[i()] = |L0; } |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}{Filter lock properties}
+  \begin{itemize}
+    \item Mutual exclusion
+      \begin{itemize}
+        \item By induction, one thread gets stuck in each level...
+      \end{itemize}
+    \item Deadlock freedom
+      \begin{itemize}
+        \item Like Peterson—only one thread can wait per level
+      \end{itemize}
+    \item Starvation freedom
+      \begin{itemize}
+        \item Like Peterson—every thread advances if any does
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{}{}
+\vskip4pt
+\parskip=4pt
+\scriptsize
+This work is licensed under a Creative Commons “Attribution-ShareAlike
+3.0 Unported” license.
+
+These slides are derived from the companion slides for \emph{The Art of
+Multiprocessor Programming,} by Maurice Herlihy and Nir Shavit. Its
+original license reads:
+\begin{quote}
+  This work is licensed under a \emph{Creative Commons Attribution-ShareAlike
+  2.5 License.}
+\begin{itemize}
+  \item \textbf{You are free}:
+    \begin{itemize}
+      \item\tiny \textbf{to Share} — to copy, distribute and transmit the work
+        \item\tiny \textbf{to Remix} — to adapt the work
+    \end{itemize}
+  \item \textbf{Under the following conditions:}
+    \begin{itemize}
+      \item\tiny \textbf{Attribution.} You must attribute the work to “The Art of
+        Multiprocessor Programming” (but not in any way that suggests
+        that the authors of that work or this endorse you or your use of
+        the work).
+      \item\tiny \textbf{Share Alike.} If you alter, transform, or build upon this work,
+        you may distribute the resulting work only under the same,
+        similar or a compatible licese.
+    \end{itemize}
+  \item For any reuse or distribution, you must make clear to others the
+    license terms of this work. The best way to do this is with a link to
+    \begin{itemize}
+      \item\tiny \url{http://creativecommons.org/licenses/by-sa/3.0/}.
+    \end{itemize}
+  \item Any of the above conditions can be waived if you get permission from
+    the copyright holder.
+  \item Nothing in this license impairs or restricts the author’s moral
+    rights.
+\end{itemize}
+\end{quote}
+\end{frame}
+
+\end{document}
