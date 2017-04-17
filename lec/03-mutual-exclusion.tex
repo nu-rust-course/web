@@ -14,6 +14,24 @@
 \hd{Spring 2017}
 \end{frame}
 
+\begin{frame}{Definitions: Time}
+  \begin{itemize}
+    \item<1-> A thread $A$ has \emph{atomic} events $a_0, a_1, a_2, \ldots$
+    \item<2-> Event $a_i^k$ is the $k$th occurrence of event $a_i$
+    \item<3-> $a \to b$ means event $a$ \emph{precedes} event $b$
+      \begin{itemize}
+        \item $(\to)$ is a total order on events
+      \end{itemize}
+    \item<4-> An \emph{interval} $I_A = (a_0, a_1)$ is the duration between
+      $a_0$ and $a_1$
+    \item<5-> Interval $I_A^k$ is the $k$th occurrence of interval $I_A$
+    \item<6-> $(a_0, a_1) \to (b_0, b_1)$ means that $a_1 \to b_0$
+      \begin{itemize}
+        \item $(\to)$ is a partial order on intervals
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]{A counter class}{}
   ««
   |K:class |D‹Counter›
@@ -44,6 +62,35 @@ t2.join();
 
 |M‹CHECK_EQUAL›(|L2, c.get_and_inc());
 »»
+\end{frame}
+
+\begin{frame}[fragile]{Counter class has a critical section}{}
+  ««
+  |K:class |D‹Counter›
+  {
+  |K‹public›:
+  	|+|T:int get_and_inc()
+    {
+    	|+|T:int old = count_; |qquad|=|C‹// danger begins›
+      count_ = old + |L1;          |>|C‹// danger ends›
+      |K:return old; |-
+    } |-
+
+  |K‹private›:
+  	|T:int count_ = |L0;
+  };
+  »»
+\end{frame}
+
+\begin{frame}{Mutual exclusion}
+  We need \emph{mutual exclusion}!
+
+  \pause\medskip
+  Definition: Critical sections can't overlap
+
+  \medskip
+  More formally, for threads $A$, $B$, and integers $j$ and $k$, either
+  $CS_A^j \to CS_B^k$ or $CS_B^k \to CS_A^j$.
 \end{frame}
 
 \begin{frame}[fragile]{Solution: A lock (a/k/a mutex)}{}
@@ -148,7 +195,7 @@ t2.join();
   ««
   |K‹class› |D‹Lock_one› : |K‹public› |D‹Lock_base›
   {
-  	|T‹bool› flag_|T‹[2]› = {};
+  	|T‹bool› flag_|T‹[2]› = {|L‹false›, |L‹false›};
 
   |K‹public›:
   	|+|K:virtual |T:void lock() |Q‹override›
@@ -157,7 +204,8 @@ t2.join();
       |K:while (flag_[j()]) {} |-
     }
 
-    |K:virtual |T:void unlock() |Q‹override› {} |-
+    |K:virtual |T:void unlock() |Q‹override›
+    { flag_[i()] = |L‹false›; } |-
   };
   »»
 \end{frame}
@@ -195,8 +243,7 @@ t2.join();
 \begin{frame}{Two other properties}{}
   Deadlock-free:
   \begin{itemize}
-    \item One ill-behaved thread does not prevent other threads from
-      locking other locks
+    \item When threads try to acquire the lock, at least one succeeds
     \item System as a whole makes progress
     \item<2> Does \textT{Lock\_one} enjoy deadlock freedom?
   \end{itemize}
