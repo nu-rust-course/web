@@ -1,0 +1,256 @@
+% vim: ts=2
+\documentclass{beamer}
+
+\usepackage{solarslides}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{frame}
+\thispagestyle{empty}\centering
+\ti{\alert{Ownership and Borrowing \\ and Lifetimes (Oh My!)}}
+\hd{EECS 3/495 “Rust”}
+\hd{Spring 2017}
+\end{frame}
+
+\begin{frame}{Definitions}{}
+  An \emph{object} is a chunk of memory with a type
+  \par
+  Examples:
+  \begin{itemize}
+    \item The number 4 is a \emph{value}, not an object
+    \item A word of memory containing the number 4 is an object
+  \end{itemize}
+  A \emph{variable} is the name of an object
+\end{frame}
+
+\begin{frame}{Ownership}{}
+  Every object in Rust has an owner. Either:
+  \begin{itemize}
+    \item a variable, or
+    \item some other object
+  \end{itemize}
+  \par\pause\medskip
+  Ownership comes with rights and responsibilities:
+  \begin{itemize}
+    \item The owner is allowed to modify the object
+    \item The owner must free the object (or pass it to another owner)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Transferring ownership}{}
+  Ownership can be transferred:
+  ««
+  |K‹pub fn› inc_vec(|T‹mut› v: |T‹Vec<usize>›, ix: |T‹usize›) {
+    	v[ix] += |L1;
+  }
+  »»
+  \pause
+  ««
+  |P‹|#[test]›
+  |K:fn test_inc_vec() {
+  	|+|K:let expected |== |M‹vec!›[ 3, 4, 6 ];
+    |K:let actual   |>= |M‹vec!›[ 3, 4, 5 ];
+
+    inc_vec(actual, |L2);
+
+    |M‹assert_eq!›(expected, actual); |pause|C‹// Error! actual has been moved› |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{One solution: FP style}
+  ««
+  |K‹pub fn› inc_vec(|T‹mut› v: |T‹Vec<usize>›, ix: |T‹usize›) -> |T‹Vec<usize>› {
+    	v[ix] += |L1;
+    	v
+  }
+
+  |P‹|#[test]›
+  |K:fn test_inc_vec() {
+  	|+let mut |=expected |==|kill%
+    |K:let |>expected     |>= |M‹vec!›[ 3, 4, 6 ];
+    |K:let |T‹mut› |>actual |>= |M‹vec!›[ 3, 4, 5 ];
+
+    actual = inc_vec(actual, |L2);
+
+    |M‹assert_eq!›(expected, actual); |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{The Rust solution: borrowing}
+  ««
+  |K‹pub fn› inc_vec(v: |T‹&mut Vec<usize>›, ix: |T‹usize›) {
+    	v[ix] += |L1;
+  }
+
+  |P‹|#[test]›
+  |K:fn test_inc_vec() {
+  	|+let mut |=expected |==|kill%
+    |K:let |>expected     |>= |M‹vec!›[ 3, 4, 6 ];
+    |K:let |T‹mut› |>actual |>= |M‹vec!›[ 3, 4, 5 ];
+
+    inc_vec(|K‹&mut› actual, |L2);
+
+    |M‹assert_eq!›(expected, actual); |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{More idiomatic Rust: take a slice}
+  ««
+  |K‹pub fn› inc_vec(v: |T‹&mut [usize]›, ix: |T‹usize›) {
+    	v[ix] += |L1;
+  }
+
+  |P‹|#[test]›
+  |K:fn test_inc_vec() {
+  	|+let mut |=expected |==|kill%
+    |K:let |>expected     |>= |M‹vec!›[ 3, 4, 6 ];
+    |K:let |T‹mut› |>actual |>= |M‹vec!›[ 3, 4, 5 ];
+
+    inc_vec(actual.as_mut_slice(), |L2);
+
+    |M‹assert_eq!›(expected, actual); |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Borrowing implements reader/writer semantics}{}
+  You can borrow
+  \begin{itemize}
+    \item as many immutable references as you like, or
+    \item one mutable reference.
+  \end{itemize}
+  ««
+  |K:let |T:mut x = |T‹SomeObject›::new();
+
+  {
+  	|+|K:let r1 = |K&x;
+      |K:let r2 = |K&x;
+      |K:let r3 = r1;
+      |K:let r4 = |K‹&mut› x; |qquad|=|C‹// error!› |-
+  }
+
+  {
+  	|+|K:let r5 = |K‹&mut› x;  |>|C‹// ok›
+      |K:let r6 = |K&x;        |>|C‹// error!› |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Hidden borrows}{}
+  Methods calls may (mutable) borrow «|D‹self›»:
+
+  ««
+  |K:impl |T:SomeObject {
+  	|K‹pub fn› f(|D‹&mut self›) { |ensuremath|cdots }
+  }
+
+
+
+  |K:let x = |T‹SomeObject›::new();
+
+  x.f(); |qquad|C‹// error: x isn't mutable›
+  »»
+\end{frame}
+
+\begin{frame}{When borrowing won't do}{}
+  \begin{itemize}
+    \item The \textT{Copy} trait for cheap copies
+    \item The \textT{Clone} trait for expensive copies
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{The Copy trait}{}
+  Types implementing the «|T‹Copy›» trait are copied implicitly rather
+  than moved:
+  \begin{itemize}
+    \item «|T‹usize›» and other built-in numeric types
+    \item «|T‹&str›» and other immutable reference types
+    \item In general, types that
+      \begin{itemize}
+        \item are cheap to copy (small), and
+        \item don't involve a \emph{resource} (\emph{e.g., heap
+          allocations})
+      \end{itemize}
+  \end{itemize}
+
+  ««
+  |K:let a = |L5;
+  |K:let b = a;
+  f(a);
+  |K:let c = a + b;
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{The Clone trait}{}
+  The «|T‹Clone›» trait supports explicity copying:
+  \begin{itemize}
+    \item «|T‹String›», «|T‹Vec›», «|T‹HashMap›», etc.
+    \item In general, types that
+      \begin{itemize}
+        \item may be expensive to copy, and
+        \item don't involve a \emph{unique resource}
+          (\emph{e.g.,} a file handle)
+      \end{itemize}
+  \end{itemize}
+
+  ««
+  |K:let v = |M‹vec!›[ 3, 4, 5 ];
+  |K:let u = v.clone();
+  f(v);
+  g(u);
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Lifetimes}
+  Object have lifetimes (or more precisely, death times)
+
+  ««
+  {
+  	|+|K:let |T:mut r: |T‹&str›;
+
+    {
+    	|+|K:let s = |T‹String›::new();
+
+      r = |K&s; |qquad|C‹// error because r outlives s› |-
+    } |qquad|C‹// s dies here› |-
+  } |qquad|C‹// r dies here›
+  »»
+
+  \pause
+  A reference must die before its referent!
+\end{frame}
+
+\begin{frame}[fragile]{The static lifetime}{}
+  The only named lifetime is «|T‹'static›»—the lifetime of the whole
+  program
+
+  String slice literals have static lifetime. That is,
+
+  ««
+  |K:let s: |T:&str = |L‹"hello"›;
+  »»
+
+  means
+
+  ««
+  |K:let s: |T‹&'static str› = |L‹"hello"›;
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Lifetime variables}{}
+  Other lifetimes are relative:
+  ««
+  |K:fn choose<|T‹'a›>(x: |T‹&'a usize›, y: |T‹&'a usize›) -> |T‹&'a usize›|pause {
+    	|+|K:if is_even(|K*x) {x}
+      |K:else |K:if is_even(|K*y) {y}
+      |K:else {|K&|L0} |-
+  }
+  »»
+\end{frame}
+
+\end{document}
