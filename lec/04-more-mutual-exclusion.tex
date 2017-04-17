@@ -1,0 +1,307 @@
+% vim: ts=2
+\documentclass{beamer}
+
+\usepackage{solarslides}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{frame}
+\thispagestyle{empty}\centering
+\ti{\alert{$n$-way Mutual Exclusion}}
+\hd{EECS 3/495 “Rust”}
+\hd{Spring 2017}
+\end{frame}
+
+\begin{frame}[fragile]{Filter algorithm for $n$ threads}{}
+  ««
+  |K‹template› <|T‹int› N>
+  |K‹class› |D‹Filter_lock› : |K‹public› |D‹Lock_base›
+  {
+  	|+|kill%
+    |T‹int› level_|T‹[N]› = {};
+    |T‹int› waiting_|T‹[N]›;
+
+    |T:bool exists_competition(|T:int level)
+    {
+    	|+|kill%
+      |K:for (|T:auto k : |D‹thread›::all_ids())
+      	|K:if (k != i() |K‹&&› level_[k] >= level)
+      		|K‹return› |L‹true›;
+      |K:return |L‹false›; |-
+    }
+    $|vdots$ |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{}{}
+  ««
+  |K‹template› <|T‹int› N>
+  |K‹class› |D‹Filter_lock› : |K‹public› |D‹Lock_base›
+  {
+  $|vdots$
+  |K‹public›:
+  	|+|kill%
+    |K‹virtual› |T‹void› lock() |Q‹override›
+    {
+    	|+|kill%
+      |K‹for› (|T:int level = |L1; level < N; ++level) {
+      	|+|kill%
+        waiting_[level] |==|kill%
+        level_[i()] |> = level;
+        waiting_[level] = i();
+        |K:while (|=exists_competition(level) |K‹&&›
+                  |>waiting_[level] == i()) {} |-
+      } |-
+    }
+    
+    |K‹virtual› |T:void unlock() |Q‹override›
+    { level_[i()] = |L0; } |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}{Filter lock properties}
+  \begin{itemize}
+    \item Mutual exclusion
+      \begin{itemize}
+        \item By induction, one thread gets stuck in each level...
+      \end{itemize}
+    \item Deadlock freedom
+      \begin{itemize}
+        \item Like Peterson—only one thread can wait per level
+      \end{itemize}
+    \item Starvation freedom
+      \begin{itemize}
+        \item Like Peterson—every thread advances if any does
+      \end{itemize}
+    \pause
+  \item Fairness?
+    \begin{itemize}
+      \item No—threads can overtake others
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Bounded waiting}{}
+  Idea: If thread $A$ ``starts before'' $B$, then $A$ enters CS before
+  $B$.
+
+  \pause
+  BUt what is “starts before”?
+\end{frame}
+
+\begin{frame}{Bounded waiting}{}
+  Divide \emph{lock()} operation into two intervals:
+  \begin{itemize}
+    \item Doorway ($D_A$), finite steps
+    \item Waiting ($W_A$), possibly unbounded
+  \end{itemize}
+
+  \pause
+  $r$-Bounded Waiting Guarantee: If $D_A^k \to D_B^j$, then $CS_A^k \to
+  CS_B^{j + r}$.
+
+  \pause
+  “If $A$ enters the doorway for the $k$th time before $B$ enters it for the
+  $j$th time, then $A$’s $k$th critical section happens before $B$’s $(j
+  + r)$th critical section.”
+\end{frame}
+
+\begin{frame}{$r$-Bounded waiting}
+  \begin{itemize}
+    \item Peterson's Algorithm (for 2) has $r = 0$
+      (first-come-first-served)
+    \item Filter algorithm (for $n$ has $r = \infty$
+      \pause
+    \item Baker algorithm (for $n$) has has $r = 0$ (first-come-first-served)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Helper class: lexicographically-ordered pairs}{}
+  ««
+  |K:template <|K:typename |T A, |K:typename |T B>
+  |K:struct |D‹LP›
+  {
+  	|T A x;
+  	|T B y;
+  };
+
+  |K:template <|K:typename |T A, |K:typename |T B>
+  |T:bool operator>(|=|T‹const LP<A, B>› |K‹&› p,
+                    |>|T‹const LP<A, B>› |K‹&› q)
+  {
+  	|K:return p.x > q.x |K‹||› (p.x == q.x |K‹&&› p.y > q.y);
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Bakery algorithm for $n$ threads}{}
+  ««
+  |K‹template› <|T‹int› N>
+  |K‹class› |D‹Bakery_lock› : |K‹public› |D‹Lock_base›
+  {
+  	|+|T‹int› max_label_ |==|kill%
+    |T‹bool› flag_|T‹[N]› |>= {|L‹false›};
+    |T‹int› label_|T‹[N]› |>= {|L0};
+    |T‹int› max_label_    |>= |L0;
+
+    |T:bool someone_is_ahead()
+    {
+    	|+|kill%
+      |K:for (|T:auto k : |D‹thread›::all_ids())
+      	|K:if (flag_[k] |K‹&&› |D‹LP›{label_[i()], i()} > |D‹LP›{label_[k], k})
+      		|K‹return› |L‹true›;
+      |K:return |L‹false›; |-
+    }
+    $|vdots$ |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{}{}
+  ««
+  |K‹template› <|T‹int› N>
+  |K‹class› |D‹Bakery_lock› : |K‹public› |D‹Lock_base›
+  {
+  $|vdots$
+  |K‹public›:
+  	|+|kill%
+    |K‹virtual› |T‹void› lock() |Q‹override›
+    {
+    	|+|kill%
+      label_[i()] |==|kill%
+      flag_[i()]  |>= |L‹true›;
+      label_[i()] |>= ++max_label_;
+      |K:while (someone_is_ahead()) {} |-
+    }
+    
+    |K‹virtual› |T:void unlock() |Q‹override›
+    { flag_[i()] = |L‹false›; } |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}{Baker Y2$^{\text{32}}$K bug}{}
+  Does overflow matter?
+
+  \centering
+  \begin{tabular}{|c|c|}
+    \hline
+    \textbf{Bits} & \textbf{Does it?} \\
+    \hline
+    \hline
+    16 & quite \\
+    32 & maybe \\
+    64 & no \\
+    \hline
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Bakery lock properties}
+  \begin{itemize}
+    \item Mutual exclusion
+      \begin{itemize}
+        \item Between any two (label[k], k) pairs, one will defer to the
+          other\ldots
+      \end{itemize}
+    \item Deadlock freedom
+      \begin{itemize}
+        \item Must be some least (label[k], k) pair
+      \end{itemize}
+    \item Starvation freedom
+      \begin{itemize}
+        \item No thread takes the same number twice
+      \end{itemize}
+    \item First-come-first-served (0-bounded waiting)
+      \begin{itemize}
+        \item First through the door has lower label, goes first
+      \end{itemize}
+      \pause
+    \item \textbf{Practical?}
+      \begin{itemize}
+        \item Have to readh $n$ variables to lock
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{“Registers” (shared memory locations)}{}
+  Flavors:
+  \begin{itemize}
+    \item Multi-reader/single-writer (flag[])
+    \item Multi-reader/multi-writer (waiting)
+    \item (Not that interesting: SRMW and SRSW)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Theorem}{}
+  At least $n$ MR\alt<3->MSW
+  (multi-reader/\alt<2->{\alert<2-3>{multi}}{single}-writer)
+  registers are needed to
+  solve deadlock-free mutual exclusion.
+
+  \uncover<4>{
+    \textbf{Proof sketch.} For $n$ = 2, one register is insufficient
+    because neither thread necessarily sees the other’s write. Then by
+    induction, the record of the first thread to enter always gets
+    obliterated by the rest.
+  }
+\end{frame}
+
+\begin{frame}{Summary}{}
+  For deadlock-free mutual exclusion of $n$ threads:
+  \begin{itemize}
+    \item Best known algorithm uses $2n$ MRSW registers
+    \item Lower bound for MRMW is $n$
+  \end{itemize}
+
+  \pause
+  $O(n)$ reads is too inefficient—we need something better, and we’ll get
+  it from the hardware
+\end{frame}
+
+\begin{frame}{}{}
+\vskip4pt
+\parskip=4pt
+\scriptsize
+This work is licensed under a Creative Commons “Attribution-ShareAlike
+3.0 Unported” license.
+
+These slides are derived from the companion slides for \emph{The Art of
+Multiprocessor Programming,} by Maurice Herlihy and Nir Shavit. Its
+original license reads:
+\begin{quote}
+  This work is licensed under a \emph{Creative Commons Attribution-ShareAlike
+  2.5 License.}
+\begin{itemize}
+  \item \textbf{You are free}:
+    \begin{itemize}
+      \item\tiny \textbf{to Share} — to copy, distribute and transmit the work
+        \item\tiny \textbf{to Remix} — to adapt the work
+    \end{itemize}
+  \item \textbf{Under the following conditions:}
+    \begin{itemize}
+      \item\tiny \textbf{Attribution.} You must attribute the work to “The Art of
+        Multiprocessor Programming” (but not in any way that suggests
+        that the authors of that work or this endorse you or your use of
+        the work).
+      \item\tiny \textbf{Share Alike.} If you alter, transform, or build upon this work,
+        you may distribute the resulting work only under the same,
+        similar or a compatible licese.
+    \end{itemize}
+  \item For any reuse or distribution, you must make clear to others the
+    license terms of this work. The best way to do this is with a link to
+    \begin{itemize}
+      \item\tiny \url{http://creativecommons.org/licenses/by-sa/3.0/}.
+    \end{itemize}
+  \item Any of the above conditions can be waived if you get permission from
+    the copyright holder.
+  \item Nothing in this license impairs or restricts the author’s moral
+    rights.
+\end{itemize}
+\end{quote}
+\end{frame}
+
+\end{document}
