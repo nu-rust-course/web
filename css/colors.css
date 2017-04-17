@@ -1,0 +1,36 @@
+code {
+  /* KeyWordTok */
+  /* DataTypeTok */
+  /* DecValTok (decimal value), BaseNTok, FloatTok */
+  /* CharTok */
+  /* StringTok */
+  /* CommentTok */
+  /* OtherTok */
+  /* AlertTok */
+  /* FunctionTok */
+  /* RegionMarkerTok */
+  /* ErrorTok */ }
+  code .kw {
+    color: #268bd2; }
+  code .dt {
+    color: #268bd2; }
+  code .dv, code .bn, code .fl {
+    color: #6c71c4; }
+  code .ch {
+    color: #dc322f; }
+  code .st {
+    color: #d33682; }
+  code .co {
+    color: #93a1a1; }
+  code .ot {
+    color: #b58900; }
+  code .al {
+    color: #cb4b16;
+    font-weight: bold; }
+  code .fu {
+    color: #2aa198; }
+  code .er {
+    color: #dc322f;
+    font-weight: bold; }
+
+/*# sourceMappingURL=colors.css.map */

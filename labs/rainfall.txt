@@ -1,0 +1,34 @@
+rainfall
+
+Reads a sequence of rainfall measurements from the standard input and
+writes a summary to the standard output.
+
+INPUT
+
+The input format is a sequence of measurements represented as
+unitless, non-negative numbers, written in ASCII, one per line:
+
+    12.5
+    18
+    7
+    0
+    4
+
+Any noise in the input---blank lines, non-numeric text, negative
+numbers---should be ignored:
+
+    seven
+    -9
+
+Input terminates with either end-of-file or upon reaching a line "999".
+
+OUTPUT
+
+The program computes three quantities: the mean (valid) measurement,
+the count of measurements in the interval [mean - 5, mean), and the
+count of measurements in the interval (mean, mean + 5]. It prints the
+results in this format:
+
+    Mean rainfall: 8.3 cm
+    Below count:   2
+    Above count:   1

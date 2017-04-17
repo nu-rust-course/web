@@ -1,0 +1,47 @@
+@charset "UTF-8";
+@import url(http://fonts.googleapis.com/css?family=Roboto:300,300italic,700|Lora:400,700,400italic&subset=latin);
+.body-font {
+  font: 300 100%/160% Lora, Garamond, serif; }
+
+.head-font {
+  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 200; }
+
+q {
+  quotes: "“" "”" "‘" "’"; }
+
+div.sourceCode {
+  overflow-x: auto; }
+
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0;
+  padding: 0;
+  vertical-align: baseline;
+  border: none; }
+
+table.sourceCode {
+  width: 100%;
+  line-height: 100%; }
+
+td.lineNumbers {
+  text-align: right;
+  padding-right: 4px;
+  padding-left: 4px;
+  color: #aaaaaa;
+  border-right: 1px solid #aaaaaa; }
+
+td.sourceCode {
+  padding-left: 5px; }
+
+span.menu, span.menu-aside {
+  font-family: Roboto, "Helvetica Neue", Helvetica, sans-serif; }
+
+span.menu-aside:before {
+  content: "(menu: ";
+  font-family: Lora, Garamond, serif; }
+
+span.menu-aside:after {
+  content: ")";
+  font-family: Lora, Garamond, serif; }
+
+/*# sourceMappingURL=common.css.map */

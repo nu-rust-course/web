@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<!-- vim: sw=2 fileencoding=utf-8:
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>EECS 3/495: Concurrent Programming in Rust</title>
+<link rel="stylesheet" media="screen" href="css/screen.css" />
+<link rel="stylesheet" media="print" href="css/print.css" />
+
+<script>
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function showCalendar() {
+    $('schedule-container').className = 'open';
+  }
+
+  function hideCalendar() {
+    $('schedule-container').className = 'closed';
+  }
+
+  function onLoad() {
+    var calId = '4sodejbdkig3o8hjavbkkl1p24%40group.calendar.google.com';
+    var tz    = 'America/Chicago';
+    var day   = (new Date()).getDay() + 1;
+    var src   = 'https://www.google.com/calendar/embed' +
+                '?mode=WEEK' +
+                '&showTitle=0' +
+                '&showPrint=0' +
+                '&showCalendars=0' +
+                '&showTz=0' +
+                '&height=600' +
+                '&wkst=' + day +
+                '&bgcolor=%23eee8d5' +
+                '&src=' + calId +
+                '&color=%23B1365F' +
+                '&ctz=' + tz;
+    $('schedule-iframe').src = src;
+  }
+</script>
+
+<style>
+
+  .nw {
+    white-space: nowrap;
+  }
+
+  table.schedule {
+    margin-left: auto;
+    margin-right: auto;
+    table-layout: fixed;
+    width: 90%;
+    border: 1px solid #b58900;
+    border-collapse: collapse;
+  }
+
+  .month th, .days th {
+    text-align: center;
+  }
+
+  .month th, .days th {
+    font-family: Roboto,"Helvetica Neue",Helvetica,sans-serif;
+  }
+
+  .month th {
+    font-size: 120%;
+    padding: 0.5ex 0 0 0;
+    font-weight: normal;
+  }
+
+  .days th {
+    font-size: 80%;
+    padding: 0 0 0.5ex 0;
+  }
+
+  .schedule th, .schedule td span:first-child {
+    color: #fdf6e3;
+    background-color: #b58900;
+  }
+
+  /*
+    color: #fdf6e3;
+    background-color: #657b83;
+    */
+
+  .schedule td {
+    position: relative;
+    padding: 20px 15px 15px 15px;
+    border: 1px solid #b58900;
+    line-height: 115%;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .homework.schedule td {
+    text-align: left;
+  }
+
+  .schedule td span:first-child {
+    position: absolute;
+    display: block;
+    top: 0px;
+    right: 0px;
+    width: 2em;
+    height: height: 16px;
+    text-align: center;
+    font-family: Menlo, monospace;
+    font-size: 12px;
+  }
+
+  .schedule td span.read:before {
+    display: block;
+    font-size: 80%;
+    font-weight: bold;
+    content: 'Read before class:';
+  }
+
+  .schedule td span.read {
+    position: relative;
+    display: block;
+    bottom: -15px;
+    padding: 2px;
+  }
+
+  td.exam span {
+    background-color: #cb4b16;
+  }
+
+  h2.superhead {
+    text-align: center;
+    margin-bottom: 0;
+  }
+
+  h1.head {
+    margin-top: 0;
+  }
+
+</style>
+
+</head>
+
+<body onload="onLoad();">
+
+<header>
+<h2 class="superhead">EECS 3/495:</h2>
+<h1 class="head">Concurrent Programming in Rust</h1>
+<p class="subhead">
+<span class="printonly">Syllabus &#8211;</span>
+Spring 2017
+</p>
+<p class="subhead">
+Tech L150, TuTh, 12:30–1:50 PM
+</p>
+</header>
+
+<nav class="screenonly links">
+<ul>
+<li><a href="#info">General info</a></li>
+<li><a href="#resources">Resources</a></li>
+<li><a href="#schedule">Schedule</a></li>
+<li><a href="#policies">Policies</a></li>
+</ul>
+</nav>
+
+<main>
+
+<h3>Instructor &amp; office hours</h3>
+<table>
+<tbody>
+<tr>
+<td class="nw"><a href="/~jesse/">Jesse Tov</a></td>
+<td><code>jesse@eecs</code></td>
+<td class="nw">Ford 2-215</td>
+<td>Tue. &amp; Thu. by appointment</td>
+</tr>
+</tbody>
+</table>
+
+<section id="info">
+<h2>General information</h2>
+
+<h3>Abstract</h3>
+
+<p>
+Modern, safe programming languages such as Java and Python have become
+increasingly accepted for application-level programming, but for systems
+programming, which often requires precise, low-level control of system
+resources, programmers still turn to C and C++. The new programming
+language Rust, under development by Mozilla, promises the best of both
+worlds: the type safety of Java with the speed and expressiveness of
+C++. Through discussions, lectures, and programming exercises, students
+will learn how to program in Rust and to use its resource ownership
+model effectively. Rust is especially well suited for our particular
+focus, concurrent programming, so students will use Rust as a vehicle
+for exploring both classic concurrency problems and more contemporary
+concerns.
+</p>
+
+<h3>Prerequisites</h3>
+
+<p>
+This course assumes proficiency in C++ and some programming maturity.
+</p>
+
+<h3>Exams</h3>
+
+<p>We will have one in-class examination on
+<strong>Thursday, May 4</strong>.
+
+<p>There will be no final exam.
+
+</section>
+
+<section id="resources">
+<h2>Resources</h2>
+
+<h3>Information</h3>
+
+<p>There is no required textbook. However, you are likely to find some
+online references useful:
+
+<ul>
+  <li><a href="https://doc.rust-lang.org/book/">The Rust book</a>
+  <li><a href="https://doc.rust-lang.org/std/">The standard library
+    reference</a>
+</ul>
+
+<p>Please post your questions on our
+<a
+href="https://piazza.com/northwestern/spring2017/eecs3495">Piazza
+discussion board</a>.
+
+<h3>Software</h3>
+
+<p>We will use <a href="https://www.rust-lang.org/downloads.html">Rust
+<strong>1.16</strong></a>, currently in <strong>stable</strong>.
+On OS X or Linux, it’s recommended that you install Rust using rustup,
+with this single command:
+
+<pre>    <code>curl https://sh.rustup.rs -sSf | sh</code></pre>
+
+<p>
+Rust is also available on the lab machines (<em>tlab01.eecs</em>,
+<em>batman.eecs</em>, etc.). Add
+<code>/home/jesse/pub/rust/cargo/bin</code>
+to your <code>PATH</code>.
+</p>
+
+<p>
+We also will use C++ 2014, the current version of the C++ programming
+language; earlier versions of C++ may not work for all the code we
+write. The instructor will be using <a
+  href="https://www.jetbrains.com/clion/download/">CLion</a>, a
+cross-platform IDE. CLion ordinarily costs money, but <a
+  href="#">student licenses are available for free</a>. Any other
+conforming C++14 toolchain should work.
+</p>
+
+</section>
+
+<section id="schedule">
+<h2>Class schedule</h2>
+
+<p>
+This table specifies the course schedule; topics are tentative.
+</p>
+
+<table class="schedule">
+
+  <tr class="month"><th colspan="2">March</th></tr>
+  <tr class="days"><th>Tu</th><th>Th</th></tr>
+
+  <tr>
+    <td><span>28</span>
+      Introduction
+      [<a href="labs/rainfall.txt">rainfall spec</a>]
+    </td>
+    <td><span>30</span>
+      Hello, Rust!
+      [<a href="https://github.com/eecs395rust/code/tree/master/convert">code</a>]
+    </td>
+  </tr>
+
+  <tr class="month"><th colspan="2">April</th></tr>
+  <tr class="days"><th>Tu</th><th>Th</th></tr>
+
+  <tr>
+    <td><span>4</span>
+      Rainfall solution
+      [<a href="https://github.com/eecs395rust/code/tree/master/rainfall">code</a>]
+    </td>
+    <td><span>6</span>
+      Rust basics, continued
+      [<a
+        href="https://github.com/eecs395rust/code/tree/master/intro">code</a>]
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>11</span>
+      Ownership and borrowing
+      [<a href="lec/04-ownership.pdf">slides</a>]
+    </td>
+    <td><span>13</span>
+      ...continued...
+      [<a
+        href="https://github.com/eecs395rust/code/blob/master/ownership/src/list_set.rs">code</a>]
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>18</span>
+      Mutual exclusion
+      [<a href="lec/02-mutual-exclusion.pdf">slides</a>]
+    </td>
+    <td><span>20</span>
+      More mutual exclusion
+      [<a href="lec/03-more-mutual-exclusion.pdf">slides</a>]
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>25</span>
+      Concurrent objects and linearizability
+      [<a href="lec/05-objects.pdf">slides</a>]
+    </td>
+    <td><span>27</span>
+      Concurrency in Rust
+      [<a href="https://github.com/eecs395rust/code/tree/master/rust_concurrency">code</a>]
+    </td>
+  </tr>
+
+  <tr class="month"><th colspan="2">May</th></tr>
+  <tr class="days"><th>Tu</th><th>Th</th></tr>
+
+  <tr>
+    <td><span>2</span>
+      Concurrency in Rust, continued
+      [<a href="https://github.com/eecs395rust/code/tree/master/rust_concurrency">code</a>]
+    </td>
+    <td><span>4</span>
+      Concurrency in Rust, continued
+      [<a href="https://github.com/eecs395rust/code/tree/master/rust_concurrency">code</a>]
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>9</span>
+      Spin locks
+    </td>
+    <td><span>11</span>
+      A better concurrent list-set
+      [<a href="lec/06-listset.pdf">slides</a>, <a
+        href="https://github.com/eecs395rust/code/tree/master/cpp_list_sets">code</a>]
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>16</span>
+      A lock-free list-set
+      [<a
+        href="https://github.com/eecs395rust/code/tree/master/cpp_list_sets">code</a>]
+    </td>
+    <td><span>18</span>
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>23</span>
+    </td>
+    <td><span>25</span>
+      Presentation prep
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>30</span>
+      Final presentations
+    </td>
+    <td><span>6/1</span>
+      Final presentations
+    </td>
+  </tr>
+
+</table>
+
+</section>
+
+<section id="policies">
+<h2>Course policies</h2>
+
+<h3>Collaboration and academic integrity</h3>
+
+<p>You may not collaborate with anyone on the exam. You
+may not use any electronic tools, including phones, tablets,
+netbooks, laptops, desktop computers, etc. If in doubt, ask the
+instructor.</p>
+
+<p>Most homework assignments will be completed with a partner or team.
+You should work with your official partner or team, as specified, on
+homework assignments. You may discuss your work with anyone, but all
+work you submit must yours, or when appropriate, your team’s. However,
+the best place to discuss anything related to the course is on our <a
+  href="https://piazza.com/northwestern/spring2017/eecs3495">Piazza
+  discussion board</a>. Of course, you may always ask the instructor for
+help; when working with a partner, it’s best to ask for help together.
+</p>
+
+<p>Students who cheat will be reported to the appropriate dean.</p>
+
+<p><strong>If you are unclear on any of these policies, please ask the
+  instructor.</strong></p>
+
+<h3 id="hwpolicies">Homework</h3>
+
+<p> In general, you should submit your homework according to the
+instructions on the web page for the individual assignments.</p>
+
+<h4>Late work</h4>
+
+<p>
+Acceptance of late work is at the discretion of the instructor.
+Generally, I would rather have you do the work and learn something
+rather than skip it.
+
+<h3>Grades</h3>
+
+<p>
+Your grade will be based on your performance on
+</p>
+
+<ul>
+  <li>class participation (5%),
+  <li>four programming assignments (20%),
+  <li>one midterm exam (25%), and
+  <li>one final project (50%).
+</ul>
+
+<p>
+The mapping of raw point totals to letter grades is at the
+discretion of the instructor.
+</p>
+
+</section>
+
+</main>
+
+<footer class="main">
+<p class="screenonly">
+<a href="http://validator.w3.org/check?uri=referer"><img
+src="http://www.w3.org/html/logo/downloads/HTML5_Badge_32.png"
+alt="Valid XHTML5" /></a>
+<a
+href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Fwww.ccs.neu.edu%2Fhome%2Ftov%2Fccs.css&amp;usermedium=all"><img
+src="http://jigsaw.w3.org/css-validator/images/vcss"
+alt="Valid CSS!" /></a>
+</p>
+</footer>
+
+</body>
+</html>
