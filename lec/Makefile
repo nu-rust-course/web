@@ -13,7 +13,7 @@ Publish: $(PDFS) $(ZIPS)
 
 %.pdf: %.tex
 	cp $< build
-	( cd build; xelatex -iteraction=nonstopmode $< )
+	( cd build; xelatex -interaction=nonstopmode $< )
 	cp build/$@ .
 
 clean:
