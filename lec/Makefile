@@ -1,4 +1,4 @@
-CURRENT = 02-mutual-exclusion
+CURRENT = 05-objects
 
 TEXS = $(wildcard *.tex)
 PDFS = $(TEXS:.tex=.pdf)

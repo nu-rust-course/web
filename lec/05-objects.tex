@@ -57,7 +57,7 @@
 \begin{frame}[fragile]{Implementation: Lock-based enqueue}{}
   ««
   |K:template <|K:typename Element, |T:int capacity>
-  |T:void Lock_based_FIFO::enq(|T:Element x)
+  |T:void |D‹Lock_based_FIFO<Element, capacity>›::enq(|T:Element x)
   {
   	|+|T:LockGuard guard(lock_);
 
@@ -68,10 +68,10 @@
   »»
 \end{frame}
 
-\begin{frame}[fragile]{Implementation: Lock-based deque}{}
+\begin{frame}[fragile]{Implementation: Lock-based dequeue}{}
   ««
   |K:template <|K:typename Element, |T:int capacity>
-  |T:Element Lock_based_FIFO::deq()
+  |T:Element |D‹Lock_based_FIFO<Element, capacity>›::deq()
   {
   	|+|T:LockGuard guard(lock_);
 
@@ -139,13 +139,435 @@
   }
   »»
 \end{frame}
+
+\begin{frame}{What \emph{is} a concurrent queue?}{}
+  \begin{itemize}
+    \item Need a way to \alert{specify} a concurrent queue object
+    \item Need a way to \alert{prove} that an algorithm implements the
+      spec
+  \end{itemize}
+  \pause
+  How do we specify objects?
+\end{frame}
+
+\begin{frame}{Object specification}{}
+  In a concurrent setting:
+  \begin{itemize}
+    \item it gets the right answer (correctness, a safety property)
+    \item it doesn’t get stuck (progress, a liveness property)
+  \end{itemize}
+  Let’s start with correctness.
+\end{frame}
+
+\begin{frame}{Sequential objects}{}
+  Each object has:
+  \begin{itemize}
+    \item a \alert{state}:
+      \begin{itemize}
+        \item fields, usually
+        \item FIFO example: the sequence of elements
+      \end{itemize}
+    \item a set of \alert{methods}:
+      \begin{itemize}
+        \item only way to access/manipulate the state
+        \item FIFO example: «enq» and «deq» methods
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Sequential specification}{}
+  \begin{itemize}
+    \item If \alert{(precondition)}
+      \begin{itemize}
+        \item the object is in such-and-such a state
+        \item before you call the method,
+      \end{itemize}
+    \item<2-> then \alert{(postcondition)}
+      \begin{itemize}
+        \item the method will return a particular value
+        \item or throw a particular exception
+      \end{itemize}
+    \item<3-> and \alert{(postcondition)}
+      \begin{itemize}
+        \item the object will be in some specified state
+        \item when the method returns.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Example sequential specification: dequeue}
+  \begin{itemize}
+    \item Precondition:
+      \begin{itemize}
+        \item queue state is $x_1, x_2, \ldots, x_k$ for $k \ge 1$
+      \end{itemize}
+    \item Postcondition:
+      \begin{itemize}
+        \item returns $x_1$
+      \end{itemize}
+    \item Postcondition:
+      \begin{itemize}
+        \item queue state is $x_2, \ldots, x_k$
+      \end{itemize}
+  \end{itemize}
+  \pause
+  Easy!
+\end{frame}
+
+\begin{frame}[fragile]{Example sequential specification: dequeue}{}
+  \begin{itemize}
+    \item Precondition:
+      \begin{itemize}
+        \item queue is empty
+      \end{itemize}
+    \item Postcondition:
+      \begin{itemize}
+        \item throws «|D‹fifo_empty›» exception
+      \end{itemize}
+    \item Postcondition:
+      \begin{itemize}
+        \item state is unchanged
+      \end{itemize}
+  \end{itemize}
+  Easy!
+\end{frame}
+
+\begin{frame}{Sequential specifications are awesome!}{}
+  \begin{itemize}
+    \item All method interactions captures by side-effects on state
+    \item Each method described in isolation
+    \item Can add new methods easily
+  \end{itemize}
+  \pause
+  What about concurrent specification?
+\end{frame}
+
+\begin{frame}{Complication: methods take \only<2->{overlapping }time}{}
+  \begin{itemize}
+    \item Sequential: what is time? who cares?
+    \item Concurrent: method call is \alert{interval}, not \alert{event}
+  \end{itemize}
+  \pause
+  \begin{itemize}
+    \item Sequential: invariants must hold \alert{between} calls
+    \item Concurrent: overlapping means might \alert{never} be between
+      calls
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The Big Question}{}
+  What does it \alert{mean} for a \emph{concurrent} object to be
+  correct?
+  \par\smallskip
+  \pause
+  Or, what \alert{is} a concurrent FIFO queue?
+  \pause
+  \begin{itemize}
+    \item FIFO means stuff happens in order
+    \item concurrent means time/order is kinda ambiguous
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Intuitively\ldots}{}
+  ««
+  |K:template <|K:typename Element, |T:int capacity>
+  |T:void |D‹Lock_based_FIFO<Element, capacity>›::enq(|T:Element x) {
+  	|+|color‹red›LockGuard guard(lock_);
+    |K:if (tail_ - head_ == capacity) |K:throw |D‹fifo_full›();
+    data_[tail_++ |% capacity] = x; |-
+  }
+
+  |K:template <|K:typename Element, |T:int capacity>
+  |T:Element |D‹Lock_based_FIFO<Element, capacity>›::deq() {
+  	|+|color‹red›LockGuard guard(lock_);
+    |K:if (tail_ == head_) |K:throw |D‹fifo_empty›();
+    |K:return data_[head_++ |% capacity]; |-
+  }
+  »»
+  \pause
+  Mutual exclusion means we can describe the behavior sequentially
+\end{frame}
+
+\begin{frame}{Linearizability}{}
+  \begin{itemize}
+    \item Each method “takes effect” “instantaneously” between invocation
+      and response events
+    \item Object is correct if this “sequential” behavior is correct
+  \end{itemize}
+  \pause
+  Such a concurrent object is \emph{linearizable}
+\end{frame}
+
+\begin{frame}{Is linearizability really obout the object?}{}
+  A linearizable object: all of its possible \alert{executions} are
+  linearizable
+
+  {\small (Linearizable execution examples on board)}
+\end{frame}
+
+\begin{frame}{Formal model of executions}{}
+  Split method call into two events:
+  \begin{center}
+    \begin{tabular}{|l|l|l|}
+      \hline
+      Invocation & A q.enq(x) & Thread A calls q.enq(x) \\
+      \hline
+      Response & A q:void & Result is void \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\def\A{\color{solarizedRed}}
+\def\B{\color{solarizedBlue}}
+\def\C{\color{solarizedGreen}}
+\def\D{\color{solarizedViolet}}
+
+\begin{frame}<1-4>{Definition: History}
+  \uncover<2-3>{\alt<2>{Object projection:}{Thread projection:}}
+
+  \[
+    H\uncover<2-3>{|\alt<2>{\text{q}}{\text{\B B}}} =
+    \begin{tabular}{l}
+      \uncover<1-2,4>{\A A q.enq(3)} \\
+      \uncover<1-2,4>{\A A q:void} \\
+      \uncover<1,3-4>{\B B p.enq(4)} \\
+      \uncover<1,3-4>{\B B p:void} \\
+      \B B q.deq() \\
+      \B B q:3 \\
+    \end{tabular}
+  \]
+\end{frame}
+
+\begin{frame}{\emph{Complete} subhistories}
+  Remove pending invocations:
+
+  \[
+    \uncover<2>{\text{Complete}(}H\uncover<2>{)} =
+    \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \A A q:void \\
+      \uncover<1>{\A A q.deq()} \\
+      \B B p.enq(4) \\
+      \B B p:void \\
+      \B B q.deq() \\
+      \B B q:3 \\
+    \end{tabular}
+  \]
+\end{frame}
+
+\begin{frame}{\emph{Sequential} subhistories}
+  Responses immediately follow invocations (except possibly a final
+  invocation):
+
+  \[
+    H =
+    \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \A A q:void \\
+      \hline
+      \B B p.enq(4) \\
+      \B B p:void \\
+      \hline
+      \B B q.deq() \\
+      \B B q:3 \\
+      \hline
+      \A A q.deq() \\
+    \end{tabular}
+  \]
+\end{frame}
+
+\begin{frame}{History \emph{well-formedness}}
+  \[
+    H = \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \B B p.enq(4) \\
+      \B B p:void \\
+      \B B q:deq() \\
+      \A A q:void \\
+      \B B q:3 \\
+    \end{tabular}
+  \]
+  \pause
+  $H$ is well formed if its thread projections are sequential:
+  \pause
+  \begin{align*}
+    H|{\text{\A A}} &= \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \A A q:void \\
+    \end{tabular}
+    &
+    H|{\text{\B B}} &= \begin{tabular}{l}
+      \B B p.enq(4) \\
+      \B B p:void \\
+      \hline
+      \B B q.deq() \\
+      \B B q:3 \\
+    \end{tabular}
+  \end{align*}
+\end{frame}
+
+\begin{frame}{History equivalence}{}
+  \begin{align*}
+    H &= \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \B B p.enq(4) \\
+      \B B p:void \\
+      \B B q:deq() \\
+      \A A q:void \\
+      \B B q:3 \\
+    \end{tabular}
+    &
+    G &= \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \A A q:void \\
+      \B B p.enq(4) \\
+      \B B p:void \\
+      \B B q:deq() \\
+      \B B q:3 \\
+    \end{tabular}
+  \end{align*}
+  \pause
+  $G \sim H$ iff threads see the same things:
+  \begin{align*}
+    H|\text{\A A} &= G|\text{\A A} \\
+    H|\text{\B B} &= G|\text{\B B} \\
+  \end{align*}
+\end{frame}
+
+\begin{frame}{Sequential specification}
+  A \emph{sequential specification} describes a legal single-thread,
+  single-object history
+
+  \pause
+  \bigskip
+  A grammar for (\alert{unbounded}) FIFO histories:
+  \begin{center}
+    \begin{tabular}{r@{\quad::=\quad}l}
+      $H$ & $H_\epsilon$ \\[8pt]
+      $H_{x_1,\ldots,x_k}$ & \\
+      $H_{x_1,\ldots,x_k}$ & q.enq($x$); q:void; $H_{x_1,\ldots,x_k,x}$ \\
+      $H_{x_0,x_1,\ldots,x_k}$ & q.deq(); q:$x_0$; $H_{x_1,\ldots,x_k}$ \\
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}{\emph{Legal} histories}
+  A sequential (multi-object, multi-thread) history $H$ is \emph{legal}
+  if:
+  \begin{center}
+    For every object $x$, $H|x$ is in the sequential spec for
+    $x$.
+  \end{center}
+\end{frame}
+
+\begin{frame}{\emph{Precedence}}{}
+  A method all $c$ \emph{precedes} a method call $d$ if $c$’s response
+  comes before $d$'s invocation
+
+  \pause
+  Example:
+  \[
+    \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \C B p.enq(4) \\
+      \C B p:void \\
+      \A A q:void \\
+      \B B q.deq() \\
+      \B B q:3 \\
+    \end{tabular}
+  \]
+
+  \begin{itemize}
+    \item Method call {\A A q.enq(3)} precedes method call
+      {\B B q.deq()}
+    \item Method call {\C A q.enq(4)} precedes method call
+      {\B B q.deq()}
+    \item Method call {\A A q.enq(3)} \alert{does not precede}
+      method call {\C B q.enq(4)}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Properties of precedence}{}
+  \begin{itemize}
+    \item In general, it’s a partial order
+    \item For a sequential history, it’s a total order
+  \end{itemize}
+  Have we seen this before?
+
+  \pause
+  Yes: Precedence is \emph{happens-before} $(\to)$ for method call
+  intervals
+\end{frame}
+
+\begin{frame}{Linearizability, formally}
+  History $H$ is \emph{linearizable} if it can be extended to complete
+  history $G$ by
+  \begin{itemize}
+    \item appending responses to some pending invocations, and/or
+    \item discarding the remaining pending invocations
+  \end{itemize}
+  such that there exists some legal sequential history $S \sim G$ where
+  ${\to_H} \subseteq {\to_S}$
+\end{frame}
+
+\begin{frame}{Example}{}
+  \begin{align*}
+    H &= \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \B B q.enq(4) \\
+      \B B q:void \\
+      \C B q.deq() \\
+      \C B q:4 \\
+      \D B q.enq(6) \\
+      \\
+    \end{tabular}
+    &
+    \pause
+    G &= \begin{tabular}{l}
+      \A A q.enq(3) \\
+      \B B q.enq(4) \\
+      \B B q:void \\
+      \C B q.deq() \\
+      \C B q:4 \\
+      \\
+      \A A q:void \\
+    \end{tabular}
+    &
+    \pause
+    S &= \begin{tabular}{l}
+      \B B q.enq(4) \\
+      \B B q:void \\
+      \A A q.enq(3) \\
+      \A A q:void \\
+      \C B q.deq() \\
+      \C B q:4 \\
+      \\
+    \end{tabular}
+  \end{align*}
+  \pause
+  \begin{itemize}
+    \item $S$ is legal and sequential
+    \item $S \sim G$
+    \item ${\to_H} \subseteq {\to_S}$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Composability theorem}
+  History $H$ is linearizable if for every object $x$, $H|x$ is
+  linearizable
+
+  \pause\medskip
+  This means we can reason about objects independently
+\end{frame}
+
 \begin{frame}{}{}
 \vskip4pt
 \parskip=4pt
 \scriptsize
 This work is licensed under a Creative Commons “Attribution-ShareAlike
 3.0 Unported” license.
-
+\par
 These slides are derived from the companion slides for \emph{The Art of
 Multiprocessor Programming,} by Maurice Herlihy and Nir Shavit. Its
 original license reads:
