@@ -1,0 +1,184 @@
+% vim: ts=2
+\documentclass{beamer}
+
+\usepackage{solarslides}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{frame}
+\thispagestyle{empty}\centering
+\ti{\alert{Concurrent Objects and Linearizability}}
+\hd{EECS 3/495 “Rust”}
+\hd{Spring 2017}
+\end{frame}
+
+\begin{frame}{What is a concurrent object?}{}
+  \begin{itemize}
+    \item<1-2> How do we \alert{describe} one?
+    \item<1> How do we \alert{implement} one?
+    \item<1-2> How do we \alert{tell if we’re right}?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Case study: FIFO queue}{}
+  \begin{center}
+    q = \begin{tabular}{|c|c|c|c}
+      \hline
+      \uncover<-4>{{\textL2}} & {\textL4} & \uncover<3->{{\textL6}} & \\
+      \hline
+    \end{tabular}
+  \end{center}
+  \uncover<2->{«q.enq({\textL 6})»}
+
+  \uncover<4->{«q.deq()»} \uncover<5->{$\Rightarrow$ \textL2}
+\end{frame}
+
+\begin{frame}[fragile]{Implementation: Lock-based ring buffer}{}
+  ««
+  |P‹|#include <array>›
+
+  |K:template <|K:typename Element, |T:int capacity>
+  |K:class |D‹Lock_based_FIFO›
+  {
+  |K‹public›:
+  	|+|T:void enq(|T‹Element›);
+    |T:Element deq(); |-
+
+  |K‹private›:
+  	|+|T‹std::array<Element, capacity>› data_;
+    |T:unsigned head_ = |L0, tail_ = |L0;
+    |T:Lock lock_; |-
+  };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Implementation: Lock-based enqueue}{}
+  ««
+  |K:template <|K:typename Element, |T:int capacity>
+  |T:void Lock_based_FIFO::enq(|T:Element x)
+  {
+  	|+|T:LockGuard guard(lock_);
+
+    |K:if (tail_ - head_ == capacity) |K:throw |D‹fifo_full›();
+
+    data_[tail_++ |% capacity] = x; |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Implementation: Lock-based deque}{}
+  ««
+  |K:template <|K:typename Element, |T:int capacity>
+  |T:Element Lock_based_FIFO::deq()
+  {
+  	|+|T:LockGuard guard(lock_);
+
+    |K:if (tail_ == head_) |K:throw |D‹fifo_empty›();
+
+    |K:return data_[head_++ |% capacity]; |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}{Now consider this}{}
+  Same thing, but:
+  \begin{itemize}
+    \item no mutual exclusion
+    \item only two threads:
+      \begin{itemize}
+        \item one only enqueues
+        \item one only dequeues
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Wait-free SRSW FIFO}{}
+  ««
+  |P‹|#include <array>›
+  |P‹|#include <atomic>›
+
+  |K:template <|K:typename Element, |T:int capacity>
+  |K:class |D‹Wf_SRSW_FIFO›
+  {
+  |K‹public›:
+  	|+|T:void enq(|T‹Element›);
+    |T:Element deq(); |-
+
+  |K‹private›:
+  	|+|T‹std::array<Element, capacity>› data_;
+    |T‹std::atomic<unsigned long>› head_{|L0}, tail_{|L0}; |-
+  };
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Wait-free SRSW enqueue}{}
+  ««
+  |K:template <|K:typename Element, |T:int capacity>
+  |T:void |D‹Wf_SRSW_FIFO<Element, capacity>›::enq(|T:Element x)
+  {
+    	|+|K:if (tail_ - head_ == capacity) |K:throw |D‹fifo_full›();
+
+    data_[tail_ |% capacity] = x;
+    ++tail_; |-
+  }
+  »»
+\end{frame}
+
+\begin{frame}[fragile]{Wait-free SRSW deque}{}
+  ««
+  |K:template <|K:typename Element, |T:int capacity>
+  |T:Element |D‹Wf_SRSW_FIFO<Element, capacity>›::deq()
+  {
+    	|+|K:if (tail_ == head_) |K:throw |D‹fifo_empty›();
+
+    |T:Element result = data_[head_ |% capacity];
+    ++head_;
+    |K:return result; |-
+  }
+  »»
+\end{frame}
+\begin{frame}{}{}
+\vskip4pt
+\parskip=4pt
+\scriptsize
+This work is licensed under a Creative Commons “Attribution-ShareAlike
+3.0 Unported” license.
+
+These slides are derived from the companion slides for \emph{The Art of
+Multiprocessor Programming,} by Maurice Herlihy and Nir Shavit. Its
+original license reads:
+\begin{quote}
+  This work is licensed under a \emph{Creative Commons Attribution-ShareAlike
+  2.5 License.}
+\begin{itemize}
+  \item \textbf{You are free}:
+    \begin{itemize}
+      \item\tiny \textbf{to Share} — to copy, distribute and transmit the work
+        \item\tiny \textbf{to Remix} — to adapt the work
+    \end{itemize}
+  \item \textbf{Under the following conditions:}
+    \begin{itemize}
+      \item\tiny \textbf{Attribution.} You must attribute the work to “The Art of
+        Multiprocessor Programming” (but not in any way that suggests
+        that the authors of that work or this endorse you or your use of
+        the work).
+      \item\tiny \textbf{Share Alike.} If you alter, transform, or build upon this work,
+        you may distribute the resulting work only under the same,
+        similar or a compatible license.
+    \end{itemize}
+  \item For any reuse or distribution, you must make clear to others the
+    license terms of this work. The best way to do this is with a link to
+    \begin{itemize}
+      \item\tiny \url{http://creativecommons.org/licenses/by-sa/3.0/}.
+    \end{itemize}
+  \item Any of the above conditions can be waived if you get permission from
+    the copyright holder.
+  \item Nothing in this license impairs or restricts the author’s moral
+    rights.
+\end{itemize}
+\end{quote}
+\end{frame}
+
+\end{document}
