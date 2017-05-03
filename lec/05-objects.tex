@@ -523,7 +523,7 @@
       \\
     \end{tabular}
     &
-    \pause
+    \uncover<2->{
     G &= \begin{tabular}{l}
       \A A q.enq(3) \\
       \B B q.enq(4) \\
@@ -533,8 +533,9 @@
       \\
       \A A q:void \\
     \end{tabular}
+    }
     &
-    \pause
+    \uncover<3->{
     S &= \begin{tabular}{l}
       \B B q.enq(4) \\
       \B B q:void \\
@@ -544,13 +545,15 @@
       \C B q:4 \\
       \\
     \end{tabular}
+    }
   \end{align*}
-  \pause
+  \uncover<4->{
   \begin{itemize}
     \item $S$ is legal and sequential
     \item $S \sim G$
     \item ${\to_H} \subseteq {\to_S}$
   \end{itemize}
+  }
 \end{frame}
 
 \begin{frame}{Composability theorem}
