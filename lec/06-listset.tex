@@ -1,0 +1,60 @@
+% vim: ts=2
+\documentclass{beamer}
+
+\usepackage{solarslides}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{frame}
+\thispagestyle{empty}\centering
+\ti{\alert{Building a Better List-Set}}
+\hd{EECS 3/495 “Rust”}
+\hd{Spring 2017}
+\end{frame}
+
+\begin{frame}{Can we do better?}{}
+  Coarse-grained synchronization:
+  \begin{itemize}
+    \item Lock the whole object for each operation
+      \pause
+    \item Easy to reason about :-)
+      \pause
+    \item But sequential bottleneck :-(
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Four strategies}
+  \begin{enumerate}
+    \item Fine-grained synchronization
+      \pause
+      \begin{itemize}
+        \item[:-)] Can synchronize on different parts of object
+          concurrently
+          \pause
+        \item[:-(] But lots of locking/unlocking overhead
+      \end{itemize}
+      \pause
+    \item Optimistic synchronization
+      \begin{itemize}
+        \item[:-)] No need to lock while traversing
+        \item[:-(] But need to validate, and may require expensive
+          retries
+      \end{itemize}
+      \pause
+    \item Lazy synchronization
+      \begin{itemize}
+        \item[:-)] Less work needed than optimisitic synchronization
+        \item[:-(] But contended operations still need to retry
+      \end{itemize}
+      \pause
+    \item Lock-free synchronization
+      \begin{itemize}
+        \item[:-)] No longer at the mercy of the scheduler
+        \item[:-(] But complex, and maybe high overhead
+      \end{itemize}
+  \end{enumerate}
+\end{frame}
+
+\end{document}

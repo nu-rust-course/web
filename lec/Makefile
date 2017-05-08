@@ -1,4 +1,4 @@
-CURRENT = 05-objects
+CURRENT = 06-listset
 
 TEXS = $(wildcard *.tex)
 PDFS = $(TEXS:.tex=.pdf)
