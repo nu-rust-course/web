@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>EECS 3/495: Concurrent Programming in Rust</title>
+<title>EECS 3/496: System Programming in Rust</title>
 <link rel="stylesheet" media="screen" href="css/screen.css" />
 <link rel="stylesheet" media="print" href="css/print.css" />
 
@@ -144,11 +144,11 @@
 <body onload="onLoad();">
 
 <header>
-<h2 class="superhead">EECS 3/495:</h2>
-<h1 class="head">Concurrent Programming in Rust</h1>
+<h2 class="superhead">EECS 3/496:</h2>
+<h1 class="head">Systems Programming in Rust</h1>
 <p class="subhead">
 <span class="printonly">Syllabus &#8211;</span>
-Spring 2017
+Spring 2018
 </p>
 <p class="subhead">
 Tech L150, TuTh, 12:30–1:50 PM
@@ -166,16 +166,21 @@ Tech L150, TuTh, 12:30–1:50 PM
 
 <main>
 
-<h3>Instructor &amp; office hours</h3>
+<h3>Course staff &amp; office hours</h3>
 <table>
 <tbody>
 <tr>
+<th>Instructor
 <td class="nw"><a href="/~jesse/">Jesse Tov</a></td>
 <td><code>jesse@eecs</code></td>
 <td class="nw">Ford 2-215</td>
 <td>Tue. &amp; Thu. by appointment</td>
-</tr>
-</tbody>
+<tr>
+<th>TA
+<td class="nw">Eric Chang
+<td><code>ericchang2017@u</code>
+<td>TBD
+<td>TBD
 </table>
 
 <section id="info">
@@ -184,18 +189,18 @@ Tech L150, TuTh, 12:30–1:50 PM
 <h3>Abstract</h3>
 
 <p>
-Modern, safe programming languages such as Java and Python have become
-increasingly accepted for application-level programming, but for systems
-programming, which often requires precise, low-level control of system
-resources, programmers still turn to C and C++. The new programming
-language Rust, under development by Mozilla, promises the best of both
-worlds: the type safety of Java with the speed and expressiveness of
-C++. Through discussions, lectures, and programming exercises, students
-will learn how to program in Rust and to use its resource ownership
-model effectively. Rust is especially well suited for our particular
-focus, concurrent programming, so students will use Rust as a vehicle
-for exploring both classic concurrency problems and more contemporary
-concerns.
+Modern, safe programming languages such as Java and Python have
+become increasingly accepted for application-level programming, but for
+systems programming, which often requires precise, low-level control of
+system resources, programmers still turn to C and C++. The new
+programming language Rust, under development by Mozilla, promises the
+best of both worlds: the type safety of Java with the speed and
+expressiveness of C++. Through discussions, lectures, and programming
+exercises, students will learn how to program in Rust and to use its
+resource ownership model effectively. Rust is especially well suited for
+our particular focus, systems programming, so students will use Rust as
+a vehicle for exploring both classic systems programming problems and
+more contemporary concerns.
 </p>
 
 <h3>Prerequisites</h3>
@@ -207,7 +212,7 @@ This course assumes proficiency in C++ and some programming maturity.
 <h3>Exams</h3>
 
 <p>We will have one in-class examination on
-<strong>Thursday, May 4</strong>.
+<strong>Thursday, May 10</strong>.
 
 <p>There will be no final exam.
 
@@ -229,13 +234,13 @@ online references useful:
 
 <p>Please post your questions on our
 <a
-href="https://piazza.com/northwestern/spring2017/eecs3495">Piazza
+href="https://piazza.com/northwestern/spring2018/eecs3496">Piazza
 discussion board</a>.
 
 <h3>Software</h3>
 
 <p>We will use <a href="https://www.rust-lang.org/downloads.html">Rust
-<strong>1.16</strong></a>, currently in <strong>stable</strong>.
+<strong>1.25</strong></a>, currently in <strong>stable</strong>.
 On OS X or Linux, it’s recommended that you install Rust using rustup,
 with this single command:
 
@@ -269,66 +274,51 @@ This table specifies the course schedule; topics are tentative.
 
 <table class="schedule">
 
-  <tr class="month"><th colspan="2">March</th></tr>
-  <tr class="days"><th>Tu</th><th>Th</th></tr>
-
-  <tr>
-    <td><span>28</span>
-      Introduction
-      [<a href="labs/rainfall.txt">rainfall spec</a>]
-    </td>
-    <td><span>30</span>
-      Hello, Rust!
-      [<a href="https://github.com/eecs395rust/code/tree/master/convert">code</a>]
-    </td>
-  </tr>
-
   <tr class="month"><th colspan="2">April</th></tr>
   <tr class="days"><th>Tu</th><th>Th</th></tr>
 
   <tr>
-    <td><span>4</span>
+    <td></td>
+    <td><span>5</span>
+      Introduction
+      [<a href="labs/rainfall.txt">rainfall spec</a>]
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>10</span>
       Rainfall solution
-      [<a href="https://github.com/eecs395rust/code/tree/master/rainfall">code</a>]
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/rainfall">code</a>] -->
     </td>
-    <td><span>6</span>
+    <td><span>12</span>
       Rust basics, continued
-      [<a
-        href="https://github.com/eecs395rust/code/tree/master/intro">code</a>]
+      <!-- [<a -->
+        <!-- href="https://github.com/eecs395rust/code/tree/master/intro">code</a>] -->
     </td>
   </tr>
 
   <tr>
-    <td><span>11</span>
+    <td class="hwdue"><span>17</span>
       Ownership and borrowing
-      [<a href="lec/02-ownership.pdf">slides</a>]
+      <!-- [<a href="lec/02-ownership.pdf">slides</a>] -->
+      <span>Homework 1</span>
     </td>
-    <td><span>13</span>
+    <td><span>19</span>
       ...continued...
-      [<a
-        href="https://github.com/eecs395rust/code/blob/master/ownership/src/list_set.rs">code</a>]
+      <!-- [<a -->
+      <!--   href="https://github.com/eecs395rust/code/blob/master/ownership/src/list_set.rs">code</a>] -->
     </td>
   </tr>
 
   <tr>
-    <td><span>18</span>
-      Mutual exclusion
-      [<a href="lec/03-mutual-exclusion.pdf">slides</a>]
-    </td>
-    <td><span>20</span>
-      More mutual exclusion
-      [<a href="lec/04-more-mutual-exclusion.pdf">slides</a>]
-    </td>
-  </tr>
-
-  <tr>
-    <td><span>25</span>
+    <td class="hwdue"><span>24</span>
       Concurrency in Rust
-      [<a href="https://github.com/eecs395rust/code/tree/master/rust_concurrency">code</a>]
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/rust_concurrency">code</a>] -->
+      <span>Homework 2</span>
     </td>
-    <td><span>27</span>
+    <td><span>26</span>
       Concurrency in Rust, continued
-      [<a href="https://github.com/eecs395rust/code/tree/master/rust_concurrency">code</a>]
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/rust_concurrency">code</a>] -->
     </td>
   </tr>
 
@@ -336,56 +326,53 @@ This table specifies the course schedule; topics are tentative.
   <tr class="days"><th>Tu</th><th>Th</th></tr>
 
   <tr>
-    <td><span>2</span>
-      Concurrent objects and linearizability
-      [<a href="lec/05-objects.pdf">slides</a>]
+    <td class="hwdue"><span>1</span>
+      <span>Homework 3</span>
     </td>
-    <td><span>4</span>
+    <td><span>3</span>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="hwdue"><span>8</span>
+      <span>Homework 4</span>
+    </td>
+    <td><span>10</span>
       <strong>Exam</strong>
     </td>
   </tr>
 
   <tr>
-    <td><span>9</span>
-      A better concurrent list-set
-      [<a href="lec/06-listset.pdf">slides</a>, <a
-        href="https://github.com/eecs395rust/code/tree/master/cpp_list_sets">code</a>]
+    <td><span>15</span>
     </td>
-    <td><span>11</span>
-      A lock-free list-set
-      [<a
-        href="https://github.com/eecs395rust/code/tree/master/cpp_list_sets">code</a>]
+    <td><span>17</span>
     </td>
   </tr>
 
   <tr>
-    <td><span>16</span>
-      Atomics
-      [<a
-        href="https://github.com/eecs395rust/code/tree/master/atomics">code</a>]
+    <td><span>22</span>
     </td>
-    <td><span>18</span>
-      Using atomics
-      [<a
-        href="https://github.com/eecs395rust/code/tree/master/stacks">code</a>]
+    <td><span>24</span>
     </td>
   </tr>
 
   <tr>
-    <td><span>23</span>
-      Futures
-      [<a href="https://github.com/eecs395rust/code/tree/master/futures">code</a>]
-    </td>
-    <td><span>25</span>
+    <td><span>29</span>
       Presentation prep
     </td>
-  </tr>
-
-  <tr>
-    <td><span>30</span>
+    <td><span>31</span>
       Final presentations
     </td>
-    <td><span>6/1</span>
+  </tr>
+
+  <tr class="month"><th colspan="2">June</th></tr>
+  <tr class="days"><th>Tu</th><th>Th</th></tr>
+
+  <tr>
+    <td><span>5</span>
+      Final presentations
+    </td>
+    <td><span>7</span>
       Final presentations
     </td>
   </tr>
@@ -409,7 +396,7 @@ You should work with your official partner or team, as specified, on
 homework assignments. You may discuss your work with anyone, but all
 work you submit must yours, or when appropriate, your team’s. However,
 the best place to discuss anything related to the course is on our <a
-  href="https://piazza.com/northwestern/spring2017/eecs3495">Piazza
+  href="https://piazza.com/northwestern/spring2018/eecs3496">Piazza
   discussion board</a>. Of course, you may always ask the instructor for
 help; when working with a partner, it’s best to ask for help together.
 </p>
