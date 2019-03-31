@@ -148,7 +148,7 @@
 <h1 class="head">Systems Programming in Rust</h1>
 <p class="subhead">
 <span class="printonly">Syllabus &#8211;</span>
-Spring 2018
+Spring 2019
 </p>
 <p class="subhead">
 Tech M128, TuTh, 12:30–1:50 PM
@@ -173,14 +173,14 @@ Tech M128, TuTh, 12:30–1:50 PM
 <th>Instructor
 <td class="nw"><a href="/~jesse/">Jesse Tov</a></td>
 <td><code>jesse@eecs</code></td>
-<td class="nw">Ford 2-215</td>
-<td>Tue. &amp; Thu. by appointment</td>
+<td class="nw">Mudd 3510</td>
+<td>Gladly by appointment</td>
 <tr>
 <th>TA
-<td class="nw">Eric Chang
-<td><code>ericchang2017@u</code>
-<td>Tech C135
-<td>Wed. 2–4 PM
+<td class="nw">Jonathan Chan
+<td><code>jonathanchan@u</code>
+<td>
+<td>TBD
 </table>
 
 <section id="info">
@@ -212,7 +212,7 @@ This course assumes proficiency in C++ and some programming maturity.
 <h3>Exams</h3>
 
 <p>We will have one in-class examination on
-<strong>Thursday, May 10</strong>.
+<strong>Thursday, May 9</strong>.
 
 <p>There will be no final exam.
 
@@ -227,20 +227,21 @@ This course assumes proficiency in C++ and some programming maturity.
 online references useful:
 
 <ul>
-  <li><a href="https://doc.rust-lang.org/book/second-edition/">The Rust book</a>
+  <li><a href="https://doc.rust-lang.org/book/">The Rust Programming
+      Language, 2nd edition</a> (popularly known as “the Rust book”)
   <li><a href="https://doc.rust-lang.org/std/">The standard library
     reference</a>
 </ul>
 
 <p>Please post your questions on our
 <a
-href="https://piazza.com/northwestern/spring2018/eecs3496">Piazza
+href="https://piazza.com/northwestern/spring2019/eecs3496">Piazza
 discussion board</a>.
 
 <h3>Software</h3>
 
 <p>We will use <a href="https://www.rust-lang.org/downloads.html">Rust
-<strong>1.25</strong></a>, currently in <strong>stable</strong>.
+1.33.0</a>, the current stable release.
 On OS X or Linux, it’s recommended that you install Rust using rustup,
 with this single command:
 
@@ -254,18 +255,24 @@ to your <code>PATH</code>.
 </p>
 
 <p>
-We also will use C++ 2014, the current version of the C++ programming
+We also will use C++ 2017, the current version of the C++ programming
 language; earlier versions of C++ may not work for all the code we
 write. The instructor will be using <a
   href="https://www.jetbrains.com/clion/download/">CLion</a>, a
 cross-platform IDE. CLion ordinarily costs money, but <a
-  href="#">student licenses are available for free</a>. Any other
-conforming C++14 toolchain should work.
+  href="https://www.jetbrains.com/shop/eform/students">student licenses are available for free</a>. Any other
+conforming C++17 toolchain should work.
 </p>
 
-<p>There is a good Rust plugin for CLion, which your instructor uses.
-Microsoft VS Code also allegedly has good Rust support. Vim and Emacs
-work as well.</p>
+<p>For editing Rust, CLion has a <a
+  href="https://plugins.jetbrains.com/plugin/8182-rust">good plugin</a>
+that your instructor uses. Alternatively, many Rust programmers like <a
+  href="https://code.visualstudio.com/">Microsoft VS Code</a>, which
+allegedly has good Rust support via the <a
+  href="https://rls.booyaa.wtf/">Rust Language Server</a>.
+Theoretically the RLS can provide Rust support to any Language
+Server–enabled editor, including Vim and Emacs, though it’s still in
+active development and your mileage may vary.</p>
 
 </section>
 
@@ -282,47 +289,57 @@ This table specifies the course schedule; topics are tentative.
   <tr class="days"><th>Tu</th><th>Th</th></tr>
 
   <tr>
-    <td></td>
-    <td><span>5</span>
+    <td><span>2</span>
       Introduction
       [<a href="https://github.com/nu-rust-course/code/tree/master/01-ub">UB
         examples</a>;
       <a href="labs/rainfall.txt">rainfall spec</a>]
     </td>
-  </tr>
-
-  <tr>
-    <td><span>10</span>
+    <td><span>4</span>
       A first Rust program
       [<a href="https://github.com/eecs395rust/code/tree/master/02-convert">code</a>]
     </td>
-    <td><span>12</span>
-      Rainfall
-      [<a href="https://github.com/eecs395rust/code/tree/master/03-rainfall">code</a>]
-    </td>
   </tr>
 
   <tr>
-    <td class="hwdue"><span>17</span>
-      Rust basics
-      [<a href="https://github.com/eecs395rust/code/tree/master/04-intro">code</a>]
+    <td><span>9</span>
+      Rainfall in Rust
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/03-rainfall">code</a>] -->
+    </td>
+    <td class="hwdue"><span>11</span>
+      More Rust basics
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/04-intro">code</a>] -->
       <span>Homework 1</span>
     </td>
-    <td><span>19</span>
+  </tr>
+
+  <tr>
+    <td><span>16</span>
       Ownership and borrowing
-      [<a href="lec/05-ownership.pdf">slides</a>]
+      <!-- [<a href="lec/05-ownership.pdf">slides</a>] -->
+    </td>
+    <td class="hwdue"><span>18</span>
+      Linked data structures
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/05-ownership">code</a>] -->
+      <span>Homework 2</span>
     </td>
   </tr>
 
   <tr>
-    <td class="hwdue"><span>24</span>
-      Ownership and borrowing
-      [<a href="https://github.com/eecs395rust/code/tree/master/05-ownership">code</a>]
-      <span>Homework 2</span>
+    <td><span>23</span>
+      Concurrency in Rust
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/07-concurrency">code</a>] -->
     </td>
-    <td><span>26</span>
-      Iterators
-      [<a href="https://github.com/eecs395rust/code/tree/master/06-iterators">code</a>]
+    <td class="hwdue"><span>25</span>
+      More concurrency
+      <span>Homework 3</span>
+    </td>
+  </tr>
+
+  <tr>
+    <td><span>30</span>
+      Iterators in Rust
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/06-iterators">code</a>] -->
     </td>
   </tr>
 
@@ -330,52 +347,49 @@ This table specifies the course schedule; topics are tentative.
   <tr class="days"><th>Tu</th><th>Th</th></tr>
 
   <tr>
-    <td class="hwdue"><span>1</span>
-      Iterators, continued
-      <span>Homework 3</span>
-    </td>
-    <td><span>3</span>
-      Concurrency in Rust
-      [<a
-        href="https://github.com/eecs395rust/code/tree/master/07-concurrency">code</a>]
+    <td style="visibility: hidden;"></td>
+    <td class="hwdue"><span>2</span>
+      More iterators
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/08-futures">code</a>] -->
+      <span>Homework 4</span>
     </td>
   </tr>
 
   <tr>
-    <td class="hwdue"><span>8</span>
-      <span>Homework 4</span>
+    <td><span>7</span>
       Exam review
     </td>
-    <td><span>10</span>
+    <td><span>9</span>
       <strong>Exam</strong>
     </td>
   </tr>
 
   <tr>
-    <td class="hwdue"><span>15</span>
+    <td class="hwdue"><span>14</span>
+      Futures and async
       <span>Project proposal</span>
-      More concurrency
     </td>
-    <td><span>17</span>
-      Future-based concurrency
-      [<a
-        href="https://github.com/eecs395rust/code/tree/master/08-futures">code</a>]
+    <td><span>16</span>
+      Futures and async, continued
     </td>
   </tr>
 
   <tr>
-    <td class="hwdue"><span>22</span>
+    <td class="hwdue"><span>21</span>
+      Client-side web programming
       <span>Progress check 1</span>
     </td>
-    <td><span>24</span>
+    <td><span>23</span>
+      Client-side web programming, continued
     </td>
   </tr>
 
   <tr>
-    <td class="hwdue"><span>29</span>
+    <td class="hwdue"><span>28</span>
+      <em>Slack</em>
       <span>Progress check 2</span>
     </td>
-    <td><span>31</span>
+    <td><span>30</span>
       Final presentations
     </td>
   </tr>
@@ -384,11 +398,11 @@ This table specifies the course schedule; topics are tentative.
   <tr class="days"><th>Tu</th><th>Th</th></tr>
 
   <tr>
-    <td class="hwdue"><span>5</span>
+    <td class="hwdue"><span>4</span>
       Final presentations
       <span>Project code</span>
     </td>
-    <td><span>7</span>
+    <td><span>6</span>
       Final presentations
     </td>
   </tr>
@@ -409,10 +423,11 @@ instructor.</p>
 
 <p>Most homework assignments will be completed with a partner or team.
 You should work with your official partner or team, as specified, on
-homework assignments. You may discuss your work with anyone, but all
-work you submit must yours, or when appropriate, your team’s. However,
-the best place to discuss anything related to the course is on our <a
-  href="https://piazza.com/northwestern/spring2018/eecs3496">Piazza
+homework assignments. You may discuss your work with anyone, but you may
+not look at others’ code, and all work you submit must yours, or when
+appropriate, your team’s.
+The best place to discuss anything related to the course is on our <a
+  href="https://piazza.com/northwestern/spring2019/eecs3496">Piazza
   discussion board</a>. Of course, you may always ask the instructor for
 help; when working with a partner, it’s best to ask for help together.
 </p>
