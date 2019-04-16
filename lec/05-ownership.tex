@@ -4,6 +4,7 @@
 \usepackage{solarslides}
 \usepackage{graphicx}
 \usepackage{tikz}
+\usepackage{graphicx}
 
 \begin{document}
 
@@ -11,7 +12,7 @@
 \thispagestyle{empty}\centering
 \ti{\alert{Ownership and Borrowing \\ and Lifetimes (Oh My!)}}
 \hd{EECS 3/496 “Rust”}
-\hd{Spring 2018}
+\hd{Spring 2019}
 \end{frame}
 
 \begin{frame}{Definitions}{}
@@ -35,7 +36,7 @@
   Ownership comes with rights and responsibilities:
   \begin{itemize}
     \item The owner is allowed to modify the object
-    \item The owner must free the object (or pass it to another owner)
+    \item The owner must destroy the object (or transfer it to another owner)
   \end{itemize}
 \end{frame}
 
@@ -118,6 +119,44 @@
   »»
 \end{frame}
 
+\begin{frame}[fragile]{Owned\only<2->{ containers}
+                       versus borrowed\only<2->{ views}}
+  \def\P{\pause}
+  \def\U{\uncover}
+  \def\OT{\textT*{T}}
+  \def\BT{\textT*{\&T}}
+  \def\OS{\textT*{\alt<7->{Vec<T>}{String}}}
+  \def\BS{\textT*{\&\alt<7->{Vec<T>}{String}}}
+  \def\bs{\textT*{\&\alt<7->{[T]}{str}}}
+  \def\HAVE{\scriptsize\rotatebox{90}{\rlap{\textbf{have}}}}
+  \def\WANT{\scriptsize \hfill\llap{\textbf{want}}}
+  \def\EXP{\textcolor{solarizedRed}{\$\$\$}}
+  \begin{center}
+    \begin{tabular}{|lc|cc|}
+      \hline
+      &  & & \WANT \\
+      &    & \OT & \BT \\
+      \hline
+      & \OT & depends & free* \\
+      \HAVE
+      & \BT & depends & free \\
+      \hline
+    \end{tabular}
+    \par\medskip\P
+    \begin{tabular}{|lc|ccc|}
+      \hline
+      &  & & & \WANT \\
+      &    & \OS & \BS & \bs \\
+      \hline
+      & \OS & \U<3->\EXP & \U<4->{free*} & \U<4->{free*} \\
+      & \BS & \U<3->\EXP & \U<5->{free} & \U<6->{free} \\
+      \HAVE
+      & \bs & \U<3->\EXP & \U<6->{\EXP**} & \U<5->{free} \\
+      \hline
+    \end{tabular}
+  \end{center}
+\end{frame}
+
 \begin{frame}[fragile]{Borrowing implements reader/writer semantics}{}
   You can borrow
   \begin{itemize}
@@ -173,7 +212,7 @@
     \item In general, types that
       \begin{itemize}
         \item are cheap to copy (small), and
-        \item don't involve a \emph{resource} (\emph{e.g., heap
+        \item don't own a \emph{resource} (\emph{e.g., heap
           allocations})
       \end{itemize}
   \end{itemize}
@@ -187,7 +226,7 @@
 \end{frame}
 
 \begin{frame}[fragile]{The Clone trait}{}
-  The «|T‹Clone›» trait supports explicity copying:
+  The «|T‹Clone›» trait supports explicitly copying:
   \begin{itemize}
     \item «|T‹String›», «|T‹Vec›», «|T‹HashMap›», etc.
     \item In general, types that
@@ -214,10 +253,12 @@
   	|+|K:let |T:mut r: |T‹&str›;
 
     {
-    	|+|K:let s = |T‹String›::new();
+    	|+|K:let s = |L‹"hello"›.to_owned();
 
       r = |K&s; |qquad|C‹// error because r outlives s› |-
-    } |qquad|C‹// s dies here› |-
+    } |qquad|C‹// s dies here›
+
+    |M‹println!›(|L‹"{}"›, r); |-
   } |qquad|C‹// r dies here›
   »»
 
@@ -243,12 +284,39 @@
 \end{frame}
 
 \begin{frame}[fragile]{Lifetime variables}{}
-  Other lifetimes are relative:
+  All other lifetimes are relative:
   ««
-  |K:fn choose<|T‹'a›>(x: |T‹&'a usize›, y: |T‹&'a usize›) -> |T‹&'a usize›|pause {
+  |K:fn choose<|T‹'a›>(x: |T‹&'a usize›, y: |T‹&'a usize›) -> |T‹&'a usize›|pause| {
     	|+|K:if is_even(|K*x) {x}
       |K:else |K:if is_even(|K*y) {y}
       |K:else {|K&|L0} |-
+  }
+  »»
+
+  \pause
+  Why does «|K&|L0» work? How does that have
+  lifetime «|T‹'a›»?
+
+  \pause
+  Subtyping: «|T‹&'static T›» $<:$ «|T‹&'a T›».
+\end{frame}
+
+\begin{frame}[fragile]{Be careful, because it's fragile}{}
+  ««
+  |K:fn ref_even(n: |T‹&usize›) -> |T‹&usize› {
+    	|+|K:if is_even(|K*n) {n}
+      |K:else {
+      	|+|K:let zero = |L0;
+        |K&zero |-
+      } |-
+  }
+
+  |K:fn ref_even(n: |T‹&usize›) -> |T‹&usize› {
+    	|+|K:if is_even(|K*n) {n}
+      |K:else {
+      	|+|K:let zero = |K&|L0;
+        zero |-
+      } |-
   }
   »»
 \end{frame}
