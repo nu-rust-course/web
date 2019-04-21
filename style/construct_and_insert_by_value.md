@@ -1,4 +1,4 @@
-## Functions should not unconditionally clone save them
+## Functions should not unconditionally clone arguments
 
 When a function always needs ownership of some argument then it should take that argument by value, not by reference. That way the caller can clone if it wants to retain ownership as well, but avoids cloning in both the caller and the callee when the caller is ready to give up ownership.
 
