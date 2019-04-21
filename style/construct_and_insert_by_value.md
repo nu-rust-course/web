@@ -34,11 +34,11 @@ impl WidgetOwner {
 
 `WidgetOwner::from_val` never clones, whereas `WidgetOwner::from_ref` always clones. So what does this mean for the caller? If `Widget` is a typical `Clone`able type, then in general you get this:
 
-| number of clones                 | by value  | by reference  |
-| --- | --- | --- |
-| caller owns but no longer needs  | 0         | 1             |
-| caller owns and still wants      | 1         | 1             |
-| caller has borrowed              | 1         | 1             |
+| number of clones                | by value | by reference |
+| ------------------------------- | -------- | ------------ |
+| caller owns but no longer needs | 0        | 1            |
+| caller owns and still wants     | 1        | 1            |
+| caller has borrowed             | 1        | 1            |
 
 This reasoning applies to compound types as well. For example, consider a function that ultimately needs to store or return a `Vec<String>`. Here are some ways it might take its argument, and what it has to do to get ownership in each case:
 
