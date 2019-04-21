@@ -45,13 +45,13 @@ This reasoning applies to compound types as well. For example, consider a functi
 ```rust
 // Clones every string and allocates a new vector:
 fn takes_slice_of_slices(strings: &[&str]) -> … {
-    let v: Vec<String> = strings.iter().cloned().map(str::to_owned).collect();
+    let v: Vec<String> = strings.iter().map(|&s| s.to_owned()).collect();
     …
 }
 
 // Clones every string and allocates a new vector:
 fn takes_slice_of_borrowed(strings: &[&String]) -> … {
-    let v: Vec<String> = strings.iter().cloned().cloned().collect();
+    let v: Vec<String> = strings.iter().map(|&s| s.clone()).collect();
     …
 }
 
@@ -63,13 +63,13 @@ fn takes_slice_of_owned(strings: &[String]) -> … {
 
 // Clones every string and allocates a new vector:
 fn takes_vec_of_slices(strings: Vec<&str>) -> … {
-    let v: Vec<String> = strings.iter().cloned().map(str::to_owned).collect();
+    let v: Vec<String> = strings.iter().map(|&s| s.to_owned()).collect();
     …
 }
 
 // Clones every string and allocates a new vector:
 fn takes_vec_of_borrowed(strings: Vec<&String>) -> … {
-    let v: Vec<String> = strings.iter().cloned().cloned().collect();
+    let v: Vec<String> = strings.iter().map(|&s| s.clone()).collect();
     …
 }
 
@@ -84,16 +84,16 @@ How does this affect the caller? It may require one line of copying code:
 
 ```rust
 let ss: &[&str] = …;
-takes_vec_of_owned(ss.iter().cloned().map(str::to_owned).collect());
+takes_vec_of_owned(ss.iter().map(|&s| s.to_owned()).collect());
 
 let vs: Vec<&str> = …;
-takes_vec_of_owned(vs.iter().cloned().map(str::to_owned).collect())
+takes_vec_of_owned(vs.iter().map(|&s| s.to_owned()).collect())
 
 let sb: &[&String] = …;
-takes_vec_of_owned(sb.iter().cloned().cloned().collect());
+takes_vec_of_owned(sb.iter().map(|&s| s.clone()).collect());
 
 let vb: Vec<&String> = …;
-takes_vec_of_owned(vb.iter().cloned().cloned().collect())
+takes_vec_of_owned(vb.iter().map(|&s| s.clone()).collect())
 
 let so: &[String] = …;
 takes_vec_of_owned(sb.iter().cloned().collect());
