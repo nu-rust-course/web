@@ -2,8 +2,7 @@
 
 When a function always needs ownership of some argument then it should take that argument by value, not by reference. That way the caller can clone if it wants to retain ownership as well, but avoids cloning in both the caller and the callee when the caller is ready to give up ownership.
 
-Suppose we have a type `Widget` that implements `Clone`, but not cheaply
-, and suppose we have a type that owns a `Widget`:
+Suppose we have a type `Widget` that implements `Clone`, but not cheaply, and suppose we have a type that owns a `Widget`:
 
 ```rust
 pub struct WidgetOwner {
