@@ -28,10 +28,10 @@ That suggests that one algorithm is to compute $C$ (maybe one element at a time�
         fn evaluate(&mut self, word: &str, count: usize);
 
         // Returns the correction we've found:
-        fn finish(&self) -> Correction;
+        fn finish(self) -> Correction;
     }
 
-    if model.get(w).is_some() {
+    if model.contains(w) {
         return Correction::Correct;
     }
 
@@ -99,22 +99,22 @@ Before we move on, let’s be clear what the magic trie operation is:
 
 $$\cdot\,[\,\cdot\,]: \mathrm{Trie} \times \mathrm{Symbol} \rightharpoonup \mathrm{Trie}$$
 
-The funny arrow means that the operation is partial. Given a trie $T$ and symbol $c$, then $T[c]$ is defined only if $T$ contains some word starting with $c$. If it’s defined then $T[c]$ is the subtrie $T$ containing only the words starting with $c$, and with the $c$ removed. Or in math, $T[c](w’) = T(cw’)$.
+The funny arrow means that the operation is partial. Given a trie $T$ and symbol $c$, then $T[c]$ is defined only if $T$ contains some word starting with $c$. If it’s defined then $T[c]$ is the subtrie $T$ containing only the words starting with $c$, and with the $c$ removed. Or in math, $T[c](w') = T(cw')$.
 
-Now suppose you want to check some word $w = c_0 c_1 \ldots c_n$. The set of edits $e^D(w)$ can be decomposed recursively by how it’s generated:
+Now suppose you want to check some word $w = c_0 c_1 \ldots c_n$. Instead of generating the entire set of edits $e^D(w)$, we decompose it by what happens at the start of the word:
 
 | edit operation     | subset generated                                                             |
 | :----------------- | :--------------------------------------------------------------------------- |
-| insert             | $\{ c' w' \mid c' \in \mathrm{Symbol}, w' \in e^{D-1}(c_0c_1 \ldots c_n) \}$ |
-| change             | $\{ c' w' \mid c' \in \mathrm{Symbol}, w' \in e^{D-1}(c_1 \ldots c_n) \}$    |
+| insert $c'$        | $\{ c' w' \mid w' \in e^{D-1}(c_0c_1 \ldots c_n) \}$ |
+| change to $c'$     | $\{ c' w' \mid w' \in e^{D-1}(c_1 \ldots c_n) \}$    |
 | transpose          | $\{ c_1c_0 w' \mid w' \in e^{D-1}(c_2 \ldots c_n) \}$                        |
 | delete             | $e^{D-1}(c_1\ldots c_n)$                                                     |
 | none (edit later)  | $\{ c_0 w' \mid w' \in e^D(c_1 \ldots c_n) \}$                               |
 
 In other words, either some kind of edit will happen at the beginning of the word (with one fewer edits later) or it won’t happen at the beginning (with all the edits later). Each of these cases is checkable using a trie. Here are three cases:
 
-  - To find out whether inserting some character $c'$ might lead to a correction, we want to know whether any of the set $\{ c' w' \mid c' \in \mathrm{Symbol}, w' \in e^{D-1}(c_0c_1 \ldots c_n) \}$ is in domain of the *current subtrie* $T$. So we check $T[c’]$ to see whether $T$ contains any words starting with $c'$. If not then we can prune the whole set of edits that start by inserting $c'$ in front. If so then $T[c’]$ is the subtrie whose keys are $\{ r \mid c'r \in \mathop{\mathrm{dom}} T \}$. Then we recur to check whether that subtrie contains any of $e^{D-1}(c_0c_1 \ldots c_n)$.
-  - To find out whether transposing the first two characters might lead to a correction, we want to know whether the set $\{ c_1c_0 w' \mid w' \in e^{D-1}(c_2\ldots c_n) \}$ intersects with $\mathop{\mathrm{dom}} T$. We can do this by asking $T$ for its subtrie for the prefix $c_1c_0$, which if it exists is $T[c_1][c_0]$. If there is such a subtrie then we recur to search that subtrie for $e^{D-1}(c_2 \ldots c_n)$.
+  - To find out whether inserting some symbol $c'$ might lead to a correction, we want to know whether any of the set $\{ c' w' \mid w' \in e^{D-1}(c_0c_1 \ldots c_n) \}$ is in domain of the *current subtrie* $T$. So we check $T[c']$ to see whether $T$ contains any words starting with $c'$. If not then we can prune the whole set of edits that start by inserting $c'$ in front. If so then $T[c']$ is the subtrie whose keys are $\{ r \mid c'r \in \mathop{\mathrm{dom}} T \}$. Then we recur to check whether that subtrie contains any of $e^{D-1}(c_0c_1 \ldots c_n)$.
+  - To find out whether transposing the first two symbols might lead to a correction, we want to know whether the set $\{ c_1c_0 w' \mid w' \in e^{D-1}(c_2\ldots c_n) \}$ intersects with $\mathop{\mathrm{dom}} T$. We can do this by asking $T$ for its subtrie for the prefix $c_1c_0$, which if it exists is $T[c_1][c_0]$. If there is such a subtrie then we recur to search that subtrie for $e^{D-1}(c_2 \ldots c_n)$.
   - To find out whether all of the edits might come later, recursively search $T[c_0]$ for the set $e^D(c_1 \ldots c_n)$.
 
 Observe that in each case where we recur either $D$ or $w$ gets smaller, which guarantees termination.
