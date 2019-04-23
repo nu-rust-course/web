@@ -54,21 +54,10 @@ $$ \{ x \in A \mid x \in B \} = A \cap B = \{ x \in B \mid x \in A \}\,.$$
 
 In other words, filtering $A$ for the property of membership in $B$ is the same as filtering $B$ for membership in $A$. In our case, the two sets whose intersection we’re interested in are:
 
-  - the set of good words: $\mathop{\mathrm{dom}} M$, and
-  - the set of all words whose distance from $w$ is at most $D$: $\{ w' \in \mathrm{Word} \mid d(w, w') \le D \}.$
+  - $\mathop{\mathrm{dom}} M$, the set of correct words per the model, and
+  - $E^D\{ w \} \triangleq \{ w' \in \mathrm{Word} \mid d(w, w') \le D \}$, the set of all words (correct and not) whose distance from $w$ is at most $D$.
 
-To compute that set, first define the one-step edit function $e: \mathrm{Word} \to \mathcal P(\mathrm{Word})$ that takes a word to the set of itself along with all words one edit away:
-
-$$e(w) = \{w\} \cup \{ w' \in \mathrm{Word} \mid d(w, w') = 1 \}\,.$$
-
-Then you can define $n$-step edit function $e^n: \mathrm{Word} \to \mathcal P(\mathrm{Word})$ to compute the set you need by iterating function $e$:
-
-$$\begin{align}
-e^0(w)	    &= \{w\} \\
-e^{n+1}(w) &= \bigcup\{ e^n(w') \mid w' \in e(w) \}
-\end{align}$$
-
-Given the set $e^D(w)$, you could then filter by $\mathop{\mathrm{dom}} M$. The main loop from above turns into something like this:
+We could compute $E^n\{w\}$ by first defining a one-step edit function $e: \mathrm{Word} \to \mathcal P(\mathrm{Word})$, which takes a word to the set of words one edit away, and then iterating $e$ $n$ times. Once you’d computed the set $E^D\{w\}$, you could then filter by $\mathop{\mathrm{dom}} M$. The main loop from above turns into something like this:
 
 ```rust
     let mut state = SearchState::new();
@@ -85,10 +74,10 @@ Given the set $e^D(w)$, you could then filter by $\mathop{\mathrm{dom}} M$. The 
 
 So now I’ve outlined two approaches:
 
-  - Iterate through $M$, filtering each word $w'$ by $d(w, w') \le D$, and maximize. (This requires defining $d$ but not $e$.)
-  - Compute $e^D(w)$ first and then look up each element in $M$ and maximize. (This requires defining $e$ but not $d$.)
+ 1. Search the model $M$, filtering by distance from $w$, and maximize. (This requires defining $d$ but not $e$.)
+ 2. Search the set of edits $E^D\{w\}$, filtering by presence in $M$, and maximize. (This requires defining $e$ but not $d$.)
 
-If your distance similarity measure (other than edit distance) doesn’t allow you to define $e$ then you are limited to the first approach. But otherwise, which of these naïve approaches is better would depend a lot on which set is larger, $e^D(w)$ or $M$.
+If your distance similarity measure (other than edit distance) doesn’t allow you to define $e$ then you are limited to the first approach. But otherwise, which of these naïve approaches is better would depend a lot on which set is larger, $E^D\{w\}$ or $M$.
 
 In order to go faster, you need to somehow prune one of those sets—to avoid ever generating portions of one set that are obviously not in the other. The way to do it is by using a different representation for the model $M$. The naïve approach of using a hash table for $M$ lets you find any particular word quickly, but it doesn’t do a thing to help with similar words. The organization of a hash table prevents you from exploiting locality (i.e., word similarity), but other data structures will help you:
 
@@ -101,20 +90,20 @@ $$\cdot\,[\,\cdot\,]: \mathrm{Trie} \times \mathrm{Symbol} \rightharpoonup \math
 
 The funny arrow means that the operation is partial. Given a trie $T$ and symbol $c$, then $T[c]$ is defined only if $T$ contains some word starting with $c$. If it’s defined then $T[c]$ is the subtrie $T$ containing only the words starting with $c$, and with the $c$ removed. Or in math, $T[c](w') = T(cw')$.
 
-Now suppose you want to check some word $w = c_0 c_1 \ldots c_n$. Instead of generating the entire set of edits $e^D(w)$, we decompose it by what happens at the start of the word:
+Now suppose you want to check some word $w = c_0 c_1 \ldots c_n$. Instead of generating the entire set of edits $E^D\{w\}$, we decompose it by what happens at the start of the word:
 
 | edit operation     | subset generated                                                             |
 | :----------------- | :--------------------------------------------------------------------------- |
-| insert $c'$        | $\{ c' w' \mid w' \in e^{D-1}(c_0c_1 \ldots c_n) \}$ |
-| change to $c'$     | $\{ c' w' \mid w' \in e^{D-1}(c_1 \ldots c_n) \}$    |
-| transpose          | $\{ c_1c_0 w' \mid w' \in e^{D-1}(c_2 \ldots c_n) \}$                        |
-| delete             | $e^{D-1}(c_1\ldots c_n)$                                                     |
-| none (edit later)  | $\{ c_0 w' \mid w' \in e^D(c_1 \ldots c_n) \}$                               |
+| insert $c'$        | $\{ c' w' \mid w' \in E^{D-1}\{c_0c_1 \ldots c_n\} \}$ |
+| change to $c'$     | $\{ c' w' \mid w' \in E^{D-1}\{c_1 \ldots c_n\} \}$    |
+| transpose          | $\{ c_1c_0 w' \mid w' \in E^{D-1}\{c_2 \ldots c_n\} \}$                        |
+| delete             | $E^{D-1}\{c_1\ldots c_n\}$                                                     |
+| none (edit later)  | $\{ c_0 w' \mid w' \in E^D\{c_1 \ldots c_n\} \}$                               |
 
 In other words, either some kind of edit will happen at the beginning of the word (with one fewer edits later) or it won’t happen at the beginning (with all the edits later). Each of these cases is checkable using a trie. Here are three cases:
 
-  - To find out whether inserting some symbol $c'$ might lead to a correction, we want to know whether any of the set $\{ c' w' \mid w' \in e^{D-1}(c_0c_1 \ldots c_n) \}$ is in domain of the *current subtrie* $T$. So we check $T[c']$ to see whether $T$ contains any words starting with $c'$. If not then we can prune the whole set of edits that start by inserting $c'$ in front. If so then $T[c']$ is the subtrie whose keys are $\{ r \mid c'r \in \mathop{\mathrm{dom}} T \}$. Then we recur to check whether that subtrie contains any of $e^{D-1}(c_0c_1 \ldots c_n)$.
-  - To find out whether transposing the first two symbols might lead to a correction, we want to know whether the set $\{ c_1c_0 w' \mid w' \in e^{D-1}(c_2\ldots c_n) \}$ intersects with $\mathop{\mathrm{dom}} T$. We can do this by asking $T$ for its subtrie for the prefix $c_1c_0$, which if it exists is $T[c_1][c_0]$. If there is such a subtrie then we recur to search that subtrie for $e^{D-1}(c_2 \ldots c_n)$.
-  - To find out whether all of the edits might come later, recursively search $T[c_0]$ for the set $e^D(c_1 \ldots c_n)$.
+  - To find out whether inserting some symbol $c'$ might lead to a correction, we want to know whether any of the set $\{ c' w' \mid w' \in E^{D-1}\{c_0c_1 \ldots c_n\} \}$ is in domain of the *current subtrie* $T$. So we check $T[c']$ to see whether $T$ contains any words starting with $c'$. If not then we can prune the whole set of edits that start by inserting $c'$ in front. If so then $T[c']$ is the subtrie whose keys are $\{ r \mid c'r \in \mathop{\mathrm{dom}} T \}$. Then we recur to check whether that subtrie contains any of $E^{D-1}\{c_0c_1 \ldots c_n\}$.
+  - To find out whether transposing the first two symbols might lead to a correction, we want to know whether the set $\{ c_1c_0 w' \mid w' \in E^{D-1}\{c_2\ldots c_n\} \}$ intersects with $\mathop{\mathrm{dom}} T$. We can do this by asking $T$ for its subtrie for the prefix $c_1c_0$, which if it exists is $T[c_1][c_0]$. If there is such a subtrie then we recur to search that subtrie for $E^{D-1}\{c_2 \ldots c_n\}$.
+  - To find out whether all of the edits might come later, recursively search $T[c_0]$ for the set $E^D\{c_1 \ldots c_n\}$.
 
 Observe that in each case where we recur either $D$ or $w$ gets smaller, which guarantees termination.
