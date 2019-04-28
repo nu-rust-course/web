@@ -1,4 +1,4 @@
-## Strings are for text, and text is for humans
+## Strings are for text
 
 [Boolean blind](boolean_blindness.md) code collapses information that it needs down to a `bool`, typically requiring it to do extra work to get that information again in the future. By analogy, we could say that code suffers from “text blindness” when it hides hard-won knowledge in an obscure and difficult to use form—a string.
 
