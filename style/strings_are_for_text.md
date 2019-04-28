@@ -1,15 +1,17 @@
 ## Strings are for text, and text is for humans
 
-[Boolean blind](boolean_blindness) code collapses the information that it needs down to a `bool`, thus forcing additional checks later. By analogy, we could say that code suffers from “text blindness” when it hides hard-won knowledge in an obscure and difficult to use form—a string.
+[Boolean blind](boolean_blindness.md) code collapses information that it needs down to a `bool`, typically requiring it to do extra work to get that information again in the future. By analogy, we could say that code suffers from “text blindness” when it hides hard-won knowledge in an obscure and difficult to use form—a string.
 
 The basic rule is that strings are best for representing two things in computer programs:
 
  1. Pure, human-oriented text.
  2. Text-based protocols and data formats for external communication and persistent storage.
 
+What programs should not do: Hide internal, structured information inside a string.
+
 In case 1, unless your program is doing [NLP], it isn’t interested in any structure within the text beyond the (superficially) easy to discover structure of customary orthography (*e.g.,* words, sentences, paragraphs). If the text might sometimes contain some kind of machine-oriented structure (like HTML or YAML), that’s the humans’ business, and your program doesn’t intend to know or care.
 
-In case 2, structured information needs to be exchanged with other programs.<a name="return_from_talking_to_self">[¹](#talking_to_self)</a>
+In case 2, structured information needs to be exchanged with other programs.<a name="return_from_talking_to_self">[¹](#talking_to_self)</a> For example, the specification of your library or program may require it to speak CSV, HTTP<a name="return_from_http_text">[²](#http_text)</a>, JSON, MIME, SMTP, XML, or any of thousands of other textual protocols or data formats. In that case, strings are appropriate *at the edges of your program*, but not internally.When your program gets text from outside that contains structured information that it need to understand, then nearly always the *very first thing it should do* is validate and parse the text into a structured representation—structs, enums, numbers, vectors, sets, and maps—with strings confined to the leaves once no finer structure is relevant. And when your program needs to unparse structured information into a textual format for some other program to parse, then nearly always that’s the *very last thing it should do* before actually writing out or transmitting the encoded information. Usually it shouldn’t collect its output into a string, since the `Write` trait and `std::fmt::Formatter` type provide easy ways to specify serialization as a sequence of writes that may be executed with a variety of output devices, buffered or unbuffered, or accumulated into a string.
 
 Here’s what the great 20th century computer scientist Alan Perlis had to say about strings:
 
@@ -91,6 +93,8 @@ pub fn div_mod_safe(a: i32, b: i32) -> Result<(i32, i32), DivModError> {
 Using a `Result` to distinguish success from errors, and a pair of numeric types to hold the numbers, makes it much easier for client code to work with the result of this function. But 
 
 <a name="talking_to_self" href="#return_from_talking_to_self">1</a>: Include among this the special case of sending information to a future run of the same program, which won’t have the same objects at the same addresses and might even lay them out differently.
+
+<a name="http_text" href="#return_from_http_text">2</a>: HTTP transmissions are not purely text, but they start out with ASCII headers, wherein negotiation to use another encoding in the body can happen.
 
 [NLP]:
     https://en.wikipedia.org/wiki/Natural_language_processing
