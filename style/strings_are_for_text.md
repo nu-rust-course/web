@@ -41,7 +41,7 @@ Or what about this function?
 pub fn div_mod_safe(a: i32, b: i32) -> String {
     if b == 0 {
         format!("Would divide {} by zero", a)
-    } else if a == i32::max_value() && b == -1 {
+    } else if a == i32::min_value() && b == -1 {
         "Division would overflow".to_owned()
     } else {
         format!("{} {}", a / b, a % b)
@@ -55,15 +55,15 @@ Consider what a client would need to do in order to:
  2. print the quotient or the remainder without the other,
  3. use the quotient and/or the remainder in a subsequent arithmetic operation,
  4. react differently to the two possible failures, or
- 5. show the failure messages in the user’s native language.
+ 5. show the failure messages in the user’s preferred language.
 
-At this point, I hope you are wanting `div_mod` and `div_mod_safe` to return the two numbers *as numbers*, in a pair.
+At this point, I hope you are wanting `div_mod` and `div_mod_safe` to return the two numbers *as numbers*, in a pair. In some languages you’d return a third component as well to indicate errors, but Rust’s `enum`s represent the possible situations more tightly:
 
 ```rust
 pub fn div_mod_safe(a: i32, b: i32) -> Result<(i32, i32), String> {
     if b == 0 {
         Err(format!("Would divide {} by zero", a))
-    } else if a == i32::max_value() && b == -1 {
+    } else if a == i32::min_value() && b == -1 {
         Err("Division would overflow".to_owned())
     } else {
         Ok((a / b, a % b))
@@ -71,10 +71,10 @@ pub fn div_mod_safe(a: i32, b: i32) -> Result<(i32, i32), String> {
 }
 ```
 
-That solves scenarios 1–3, but for 4 and 5 we need to stop hiding the structure of the error as as string as well. Here’s the easiest way:
+That solves scenarios 1–3, but for 4 and 5 we need to stop hiding the structure of the error in a string as well. Here’s the easiest way:
 
 ```rust
-enum DivModError {
+pub enum DivModError {
     DivByZero(i32),
     WouldOverflow,
 }
@@ -82,7 +82,7 @@ enum DivModError {
 pub fn div_mod_safe(a: i32, b: i32) -> Result<(i32, i32), DivModError> {
     if b == 0 {
         Err(DivModError::DivByZero(a))
-    } else if a == i32::max_value() && b == -1 {
+    } else if a == i32::min_value() && b == -1 {
         Err(DivModError::WouldOverflow)
     } else {
         Ok((a / b, a % b))
@@ -90,7 +90,9 @@ pub fn div_mod_safe(a: i32, b: i32) -> Result<(i32, i32), DivModError> {
 }
 ```
 
-Using a `Result` to distinguish success from errors, and a pair of numeric types to hold the numbers, makes it much easier for client code to work with the result of this function. But 
+Using `Result`s to distinguish success from failure, `Option`s to distinguish presence from absence, numeric types to represent numbers, tuples and `struct`s to keep related pieces of information grouped together but represented independently, and `enum`s to distinguish alternative states—and reserving strings for text and communication—will make your code easier to write, easier to read, and maybe more efficient.
+
+For a more detailed discussion focusing on representing errors, see [here](custom_error.md).
 
 <a name="talking_to_self" href="#return_from_talking_to_self">1</a>: Include among this the special case of sending information to a future run of the same program, which won’t have the same objects at the same addresses and might even lay them out differently.
 
@@ -98,4 +100,3 @@ Using a `Result` to distinguish success from errors, and a pair of numeric types
 
 [NLP]:
     https://en.wikipedia.org/wiki/Natural_language_processing
-
