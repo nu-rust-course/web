@@ -148,10 +148,10 @@
 <h1 class="head">Systems Programming in Rust</h1>
 <p class="subhead">
 <span class="printonly">Syllabus &#8211;</span>
-Spring 2019
+Winter 2020
 </p>
 <p class="subhead">
-Tech M128, TuTh, 12:30–1:50 PM
+Annenberg Hall G01, TuTh, 11:00–12:20 PM
 </p>
 </header>
 
@@ -166,22 +166,14 @@ Tech M128, TuTh, 12:30–1:50 PM
 
 <main>
 
-<h3>Course staff &amp; office hours</h3>
+<h3>Instructor office hours</h3>
 <table>
 <tbody>
 <tr>
-<th>Instructor
 <td class="nw"><a href="/~jesse/">Jesse Tov</a></td>
 <td><code>jesse@eecs</code></td>
 <td class="nw">Mudd 3510</td>
 <td>Tu/Th 3:30–4:30 PM</td>
-<tr>
-<th>TA
-<td class="nw">Jonathan Chan
-<td><code>jonathanchan@u</code>
-<td class="nw">Wilkinson Lab
-<td>W 5–7 PM
-
 </table>
 
 <section id="info">
@@ -210,10 +202,14 @@ more contemporary concerns.
 This course assumes proficiency in C++ and some programming maturity.
 </p>
 
-<h3>Exams</h3>
+<h3>Assessment</h3>
 
-<p>We will have one in-class examination on
-<strong>Thursday, May 9</strong>.
+<p>We will have two 80-minute, in-class exams:
+
+<ul>
+<li>Thursday, January 30</li>
+<li>Thursday, February 27</li>
+</ul>
 
 <p>There will be no final exam.
 
@@ -236,21 +232,21 @@ online references useful:
 
 <p>Please post your questions on our
 <a
-href="https://piazza.com/northwestern/spring2019/eecs3496">Piazza
+href="https://campuswire.com/c/GF6C6945F">Campuswire
 discussion board</a>.
 
 <h3>Software</h3>
 
 <p>We will use <a href="https://www.rust-lang.org/downloads.html">Rust
-1.33.0</a>, the current stable release.
+1.40.0</a>, the current stable release.
 On OS X or Linux, it’s recommended that you install Rust using rustup,
 with this single command:
 
-<pre>    <code>curl https://sh.rustup.rs -sSf | sh</code></pre>
+<pre>    <code>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></pre>
 
 <p>
-Rust is also available on the lab machines (<em>tlab01.eecs</em>,
-<em>batman.eecs</em>, etc.). Add
+Rust is also available on the lab machines (<em>finagle.wot.eecs</em>,
+<em>batgirl.eecs</em>, etc.). Add
 <code>/home/jesse/pub/rust/cargo/bin</code>
 to your <code>PATH</code>.
 </p>
@@ -286,126 +282,119 @@ This table specifies the course schedule; topics are tentative.
 
 <table class="schedule">
 
-  <tr class="month"><th colspan="2">April</th></tr>
+  <tr class="month"><th colspan="2">January</th></tr>
   <tr class="days"><th>Tu</th><th>Th</th></tr>
-
-  <tr>
-    <td><span>2</span>
-      Introduction
-      [<a href="https://github.com/nu-rust-course/code/tree/master/01-ub">UB
-        examples</a>;
-      <a href="labs/rainfall.txt">rainfall spec</a>]
-    </td>
-    <td><span>4</span>
-      A first Rust program
-      [<a href="https://github.com/eecs395rust/code/tree/master/02-convert">code</a>]
-    </td>
-  </tr>
-
-  <tr>
-    <td><span>9</span>
-      Rainfall in Rust
-      [<a href="https://github.com/eecs395rust/code/tree/master/03-rainfall">code</a>]
-    </td>
-    <td class="hwdue"><span>11</span>
-      More Rust basics
-      [<a href="https://github.com/eecs395rust/code/tree/master/04-intro">code</a>]
-      <span>Homework 1</span>
-    </td>
-  </tr>
-
-  <tr>
-    <td><span>16</span>
-      Ownership and borrowing
-      [<a href="lec/05-ownership.pdf">slides</a>,
-       <a href="https://github.com/eecs395rust/code/tree/master/05-ownership">code</a>]
-    </td>
-    <td class="hwdue"><span>18</span>
-      Linked data structures
-      <span>Homework 2</span>
-    </td>
-  </tr>
-
-  <tr>
-    <td><span>23</span>
-      Concurrency in Rust
-      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/07-concurrency">code</a>] -->
-    </td>
-    <td class="hwdue"><span>25</span>
-      More concurrency
-      <span>Homework 3</span>
-    </td>
-  </tr>
-
-  <tr>
-    <td><span>30</span>
-      Iterators in Rust
-      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/06-iterators">code</a>] -->
-    </td>
-    <td style="visibility: hidden;"></td>
-  </tr>
-
-  <tr class="month"><th colspan="2">May</th></tr>
-  <tr class="days"><th>Tu</th><th>Th</th></tr>
-
-  <tr>
-    <td style="visibility: hidden;"></td>
-    <td class="hwdue"><span>2</span>
-      More iterators
-      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/08-futures">code</a>] -->
-      <span>Homework 4</span>
-    </td>
-  </tr>
 
   <tr>
     <td><span>7</span>
-      Exam review
+      Introduction<!--
+      [<a href="https://github.com/nu-rust-course/code/tree/master/01-ub">UB
+       examples</a>;
+      <a href="labs/rainfall.txt">rainfall spec</a>]-->
     </td>
     <td><span>9</span>
-      <strong>Exam</strong>
+      A first Rust program
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/02-convert">code</a>] -->
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>14</span>
-      Futures and async
-      <span>Project proposal</span>
+      Rainfall in Rust
+      <span>Homework 1</span>
     </td>
     <td><span>16</span>
-      Futures and async, continued
+      More Rust basics
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>21</span>
-      Client-side web programming
-      <span>Progress check 1</span>
+      Ownership and borrowing
+      <span>Homework 2</span>
     </td>
     <td><span>23</span>
-      Client-side web programming, continued
+      Linked data structures
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>28</span>
-      <em>Slack</em>
-      <span>Progress check 2</span>
+      Concurrency
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/07-concurrency">code</a>] -->
+      <span>Homework 3</span>
     </td>
-    <td><span>30</span>
-      Final presentations
+    <td class="exam"><span>30</span>
+      First exam
     </td>
   </tr>
 
-  <tr class="month"><th colspan="2">June</th></tr>
+  <tr class="month"><th colspan="2">February</th></tr>
   <tr class="days"><th>Tu</th><th>Th</th></tr>
+
 
   <tr>
     <td class="hwdue"><span>4</span>
-      Final presentations
-      <span>Project code</span>
+      Concurrency in Rust
+      <span>Homework 4</span>
     </td>
     <td><span>6</span>
-      Final presentations
+      Iterators
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/06-iterators">code</a>] -->
+    </td>
+  </tr>
+
+  <tr>
+    <td class="hwdue"><span>11</span>
+      More iterators
+      <!-- [<a href="https://github.com/eecs395rust/code/tree/master/08-futures">code</a>] -->
+      <span>Project proposal</span>
+    </td>
+    <td><span>13</span>
+      Futures and async
+    </td>
+  </tr>
+
+  <tr>
+    <td class="hwdue"><span>18</span>
+      Futures and async, continued
+      <span>Progress check 1</span>
+    </td>
+    <td><span>20</span>
+      Client-side web programming
+    </td>
+  </tr>
+
+  <tr>
+    <td class="hwdue"><span>25</span>
+      Client-side web programming, continued
+      <span>Progress check 2</span>
+    </td>
+    <td class="exam"><span>27</span>
+      Second exam
+    </td>
+  </tr>
+
+  <tr class="month"><th colspan="2">March</th></tr>
+  <tr class="days"><th>Tu</th><th>Th</th></tr>
+
+  <tr>
+    <td class="hwdue"><span>3</span>
+      Mixing Rust and C
+      <span>Progress check 3</span>
+    </td>
+    <td><span>5</span>
+      Making your code fast
+    </td>
+  </tr>
+
+  <tr>
+    <td class="hwdue"><span>10</span>
+      Final project presentations
+      <span>Project code</span>
+    </td>
+    <td><span>12</span>
+      Final project presentations
     </td>
   </tr>
 
@@ -418,31 +407,35 @@ This table specifies the course schedule; topics are tentative.
 
 <h3>Collaboration and academic integrity</h3>
 
-<p>You may not collaborate with anyone on the exam. You
+<p>You may not collaborate with anyone on any of the exams. You
 may not use any electronic tools, including phones, tablets,
-netbooks, laptops, desktop computers, etc. If in doubt, ask the
-instructor.</p>
+netbooks, laptops, desktop computers, etc. If in doubt, ask a
+member of the course staff.
 
 <p>Most homework assignments will be completed with a partner or team.
 You should work with your official partner or team, as specified, on
 homework assignments. You may discuss your work with anyone, but you may
-not look at others’ code, and all work you submit must yours, or when
+not look at others’ code, and all work you submit must your own, or when
 appropriate, your team’s.
 The best place to discuss anything related to the course is on our <a
-  href="https://piazza.com/northwestern/spring2019/eecs3496">Piazza
+  href="https://campuswire.com/c/GF6C6945F">Campuswire
   discussion board</a>. Of course, you may always ask the instructor for
 help; when working with a partner, it’s best to ask for help together.
 </p>
 
-<p>Students who cheat will be reported to the appropriate dean.</p>
+<p>Providing illicit help to another student is also cheating, and are
+subject to the same penalties as those who receive illicit help. It is
+your responsibility to safeguard your own work.
 
-<p><strong>If you are unclear on any of these policies, please ask the
-  instructor.</strong></p>
+<p>Students who cheat will be reported to the appropriate dean.
+
+<p>If you are unclear on any of these policies, please ask a
+member of the course staff.
 
 <h3 id="hwpolicies">Homework</h3>
 
-<p> In general, you should submit your homework according to the
-instructions on the web page for the individual assignments.</p>
+<p>In general, you should submit your homework according to the
+instructions on the web pages for the individual assignments.</p>
 
 <h4>Late work</h4>
 
@@ -454,14 +447,15 @@ rather than skip it.
 <h3>Grades</h3>
 
 <p>
+<em>Tentative:</em>
 Your grade will be based on your performance on
 </p>
 
 <ul>
-  <li>class participation (5%),
+  <li>class participation (10%),
   <li>four programming assignments (20%),
-  <li>one midterm exam (25%), and
-  <li>one final project (50%).
+  <li>two midterm exams (40%), and
+  <li>one final project (30%).
 </ul>
 
 <p>
