@@ -200,7 +200,60 @@ more contemporary concerns.
 
 <p>
 This course assumes proficiency in C++ and some programming maturity.
+In particular, we assume you are comfortable with:
 </p>
+
+<ul>
+  <li>pointers;
+  <li>static types, including generics;
+  <li>memory allocation on the stack and the heap;
+  <li>data abstraction; and
+  <li>constructors and destructors (RAII).
+</ul>
+
+<h3>Topics</h3>
+
+<ul class="topics">
+  <li>Rust language basics
+    <ul>
+      <li>basic syntax
+      <li>pointers, references, and (im)mutability
+      <li>ownership, borrowing, and lifetimes
+      <li>generic functions and types
+      <li>implementing and defining traits
+    </ul>
+  <li>more advanced Rust
+    <ul>
+      <li>concurrency
+      <li>networking
+      <li>iterators
+      <li class="optional">futures and async</li>
+      <li class="optional">client-side web programming via Web
+        Assembly</li>
+      <li class="optional">mixing Rust with C</li>
+      <li class="optional">up to you…</li>
+    </ul>
+  <li>implementation understanding
+    <ul>
+      <li>How big are things, and where are they stored?
+      <li>Where does allocation happen?
+      <li>monomorphization versus dynamic dispatch
+      <li>translating Rust to C
+    </ul>
+  <li>practical engineering skills
+    <ul>
+      <li>unit and integration testing
+      <li>benchmarking and optimization
+      <li>source control and continuous integration
+      <li>writing API documentation
+    </ul>
+  <li>design skills
+    <ul>
+      <li>factoring components into minimum viable concepts
+      <li>designing APIs for safety and efficiency
+      <li>improving code clarity
+    </ul>
+</ul>
 
 <h3>Assessment</h3>
 
@@ -239,7 +292,7 @@ discussion board</a>.
 
 <p>We will use <a href="https://www.rust-lang.org/downloads.html">Rust
 1.40.0</a>, the current stable release.
-On OS X or Linux, it’s recommended that you install Rust using rustup,
+On macOS or Linux, it’s recommended that you install Rust using rustup,
 with this single command:
 
 <pre>    <code>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></pre>
@@ -287,40 +340,39 @@ This table specifies the course schedule; topics are tentative.
 
   <tr>
     <td><span>7</span>
-      Introduction<!--
+      Introduction
       [<a href="https://github.com/nu-rust-course/code/tree/master/01-ub">UB
        examples</a>;
-      <a href="labs/rainfall.txt">rainfall spec</a>]-->
+       <a href="labs/rainfall.txt">rainfall spec</a>]
     </td>
     <td><span>9</span>
-      A first Rust program
+      Rainfall in Rust
       <!-- [<a href="https://github.com/eecs395rust/code/tree/master/02-convert">code</a>] -->
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>14</span>
-      Rainfall in Rust
       <span>Homework 1</span>
     </td>
     <td><span>16</span>
-      More Rust basics
+      TBD
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>21</span>
-      Ownership and borrowing
+      TBD
       <span>Homework 2</span>
     </td>
     <td><span>23</span>
-      Linked data structures
+      TBD
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>28</span>
-      Concurrency
+      TBD
       <!-- [<a href="https://github.com/eecs395rust/code/tree/master/07-concurrency">code</a>] -->
       <span>Homework 3</span>
     </td>
@@ -335,39 +387,39 @@ This table specifies the course schedule; topics are tentative.
 
   <tr>
     <td class="hwdue"><span>4</span>
-      Concurrency in Rust
+      TBD
       <span>Homework 4</span>
     </td>
     <td><span>6</span>
-      Iterators
+      TBD
       <!-- [<a href="https://github.com/eecs395rust/code/tree/master/06-iterators">code</a>] -->
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>11</span>
-      More iterators
+      TBD
       <!-- [<a href="https://github.com/eecs395rust/code/tree/master/08-futures">code</a>] -->
       <span>Project proposal</span>
     </td>
     <td><span>13</span>
-      Futures and async
+      TBD
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>18</span>
-      Futures and async, continued
+      TBD
       <span>Progress check 1</span>
     </td>
     <td><span>20</span>
-      Client-side web programming
+      TBD
     </td>
   </tr>
 
   <tr>
     <td class="hwdue"><span>25</span>
-      Client-side web programming, continued
+      TBD
       <span>Progress check 2</span>
     </td>
     <td class="exam"><span>27</span>
@@ -380,11 +432,11 @@ This table specifies the course schedule; topics are tentative.
 
   <tr>
     <td class="hwdue"><span>3</span>
-      Mixing Rust and C
+      TBD
       <span>Progress check 3</span>
     </td>
     <td><span>5</span>
-      Making your code fast
+      TBD
     </td>
   </tr>
 

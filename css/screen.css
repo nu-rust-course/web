@@ -572,4 +572,21 @@ table.schedule {
 table.homework.schedule td {
   text-align: left; }
 
+.topics li li {
+  margin: 0;
+}
+
+.topics li.optional {
+  font-style: italic;
+}
+
+.topics li.optional:before {
+  content: "(";
+}
+
+.topics li.optional:after {
+  content: ")";
+}
+
+
 /*# sourceMappingURL=screen.css.map */
