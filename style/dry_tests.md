@@ -46,10 +46,12 @@ That’s a big improvement, but chances are you should be writing multiple test 
 ```rust
 #[test]
 fn count_five_words() {
-    assert_count_words(&["one", "two", "one", "two", "three"], [
+    assert_count_words(&["one", "two", "one", "two", "three"], &[
         ("one",   2),
         ("two",   2),
         ("three", 1),
     ]);
 }
 ```
+
+Defining `count_five_words` is left as an exercise for the reader.
