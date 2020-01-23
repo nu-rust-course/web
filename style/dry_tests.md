@@ -28,8 +28,8 @@ But for some reason, in tests we tend to tolerate repetition that we wouldn't in
 ```rust
 #[test]
 fn count_five_words() {
-    let words: Vec<String> = ["one", "two", "one", "two", "three"]
-        .iter().map(|s| s.to_owned()).collect();
+    let words: Vec<_> = ["one", "two", "one", "two", "three"]
+        .iter().map(ToString::to_string).collect();
 
     let count_map: HashMap<String, usize> = [
         ("one",   2),
@@ -46,10 +46,12 @@ That’s a big improvement, but chances are you should be writing multiple test 
 ```rust
 #[test]
 fn count_five_words() {
-    assert_count_words(&["one", "two", "one", "two", "three"], [
+    assert_count_words(&["one", "two", "one", "two", "three"], &[
         ("one",   2),
         ("two",   2),
         ("three", 1),
     ]);
 }
 ```
+
+Defining `count_five_words` is left as an exercise for the reader.
