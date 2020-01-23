@@ -1,4 +1,4 @@
-CURRENT = 05-ownership
+CURRENT = ownership
 
 TEXS = $(wildcard *.tex)
 PDFS = $(TEXS:.tex=.pdf)
