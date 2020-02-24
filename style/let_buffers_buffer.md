@@ -64,8 +64,8 @@ impl fmt::Display for P2 {
 }
 
 // Here’s how we use the impl above:
-fn use_it(p: &P2, mut o: impl io::Write) -> std::io::Result<()> {
-    write!(o, "{}", p)
+fn use_it(mut out: impl io::Write, p: &P2) -> std::io::Result<()> {
+    write!(out, "{}", p)
 }
 ```
 
