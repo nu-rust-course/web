@@ -1,4 +1,4 @@
-## Don’t “double buffer” your test output
+## Don’t “double buffer” your text formatting output
 
 When you need to produce output in several pieces, don’t assemble your output in a string. That amounts to doing your own ad-hoc output buffering on top of the buffering that the output stream should already by doing <a name="back-1"></a>\[[1]]. Instead, write to the output stream piece by piece and avoid creating intermediate strings that 1) you don’t need and 2) make your code more complicated.
  
