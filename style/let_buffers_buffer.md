@@ -7,19 +7,22 @@ Suppose you have a 2-D point type that you wish to print out as an ordered pair:
 ```rust
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct P2 {
-  x: f32,
-  y: f32,
+    x: f32,
+    y: f32,
 }
 
+use std::io;
+
 impl P2 {
-    fn bad_write(&self, out: mut impl Write) -> io::Result<()> {
+    fn bad_write(&self, mut out: impl io::Write) -> io::Result<()> {
         let mut buf = String::new();
         buf.push('(');
         buf.push_str(&self.x.to_string());
         buf.push_str(", ");
         buf.push_str(&self.y.to_string());
         buf.push(')');
-        out.write_str(&buf)
+
+        out.write_all(buf.as_bytes())
     }
 }
 ```
@@ -28,12 +31,13 @@ Don’t! Better to write each piece directly:
 
 ```rust
 impl P2 {
-    fn good_write(&self, out: mut impl Write) -> io::Result<()> {
-        out.write_char('(')?;
-        out.write_str(&self.x.to_string())?;  // temporary String
-        out.write_str(", ")?;
-        out.write_str(&self.y.to_string())?;  // and another!
-        out.write_char(')')
+    fn good_write(&self, mut out: impl io::Write) -> io::Result<()> {
+        let write = |s: &str| out.write_all(s.as_bytes());
+        write("(")?;
+        write(&self.x.to_string())?; // temporary String
+        write(", ")?;
+        write(&self.y.to_string())?; // and another!
+        write(")")
     }
 }
 ```
@@ -42,19 +46,38 @@ And better still to take advantage of the language’s excellent formatting faci
 
 ```rust
 impl P2 {
-    fn good_write(&self, out: mut impl Write) -> io::Result<()> {
+    fn best_write(&self, mut out: impl Write) -> io::Result<()> {
         write!(out, "({}, {})", self.x, self.y)
     }
 }
 ```
 
+Finally, if you don’t actually need the full capabilities of the `std::io::Write` trait—if you’re just formatting something—maybe you want to take a `std::fmt::Formatter` instead. If you have your own type already then you can tell Rust how to print it by implementing the `std::fmt::Display` trait:
+
+```rust
+use std::{fmt, io};
+
+impl fmt::Display for P2 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+// Here’s how we use the impl above:
+fn use_it(p: &P2, mut o: impl io::Write) -> std::io::Result<()> {
+    write!(o, "{}", p)
+}
+```
+
+If you don’t have your own type already then you might find it worth making one. I’ll show an example of this technique at the end.
+
 ### Loops
 
-That said, not everything you want to format can be done in all one `write !`. For example, sometimes you need a loop. But that still doesn’t mean you should create a temporary `String`. Here’s an example:
+Sometimes not everything you want to format can be done in all one `write!`. For example, sometimes you need a loop. But that still doesn’t mean you should create a temporary `String`. Here’s an example:
 
 ```rust
 // Writes the items as a numbered list.
-fn write_numbered(out: mut impl Write, items: &[&str]) -> io::Result<()> {
+fn write_numbered(mut out: impl Write, items: &[&str]) -> io::Result<()> {
     for (i, item) in (1..).zip(items) {
         writeln!(out, "{}. {}", i, item)?;
     }
