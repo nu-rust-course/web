@@ -104,7 +104,7 @@
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 <p>(It’s possible to make the <code>UnknownLabel</code> variant borrow the label rather than own it, but it’s probably not worth it, as it would prevent an error from outliving the input that its label was parsed and borrowed from, which would be major a problem.)</p>
 <p>If we want to generate these errors ourselves, that’s easy:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">let</span> w1  <span class="op">=</span> query_words<span class="op">.</span>next()</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">let</span> w1 <span class="op">=</span> query_words<span class="op">.</span>next()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>    <span class="op">.</span>ok_or(<span class="pp">GraphError::</span>QueryTooShort)<span class="op">?;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">let</span> w2 <span class="op">=</span> query_words<span class="op">.</span>next()</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    <span class="op">.</span>ok_or(<span class="pp">GraphError::</span>QueryTooShort)<span class="op">?;</span></span>
@@ -112,13 +112,13 @@
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    <span class="kw">return</span> <span class="cn">Err</span>(<span class="pp">GraphError::</span>QueryTooLong)<span class="op">;</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="kw">let</span> src    <span class="op">=</span> label_map<span class="op">.</span>get_index(w1)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="kw">let</span> src <span class="op">=</span> label_map<span class="op">.</span>get_index(w1)</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    <span class="op">.</span>ok_or_else(<span class="op">||</span> <span class="pp">GraphError::</span>UnknownLabel(w1<span class="op">.</span>to_owned()))<span class="op">?;</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="kw">let</span> dst    <span class="op">=</span> label_map<span class="op">.</span>get_index(w2)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="kw">let</span> dst <span class="op">=</span> label_map<span class="op">.</span>get_index(w2)</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>    <span class="op">.</span>ok_or_else(<span class="op">||</span> <span class="pp">GraphError::</span>UnknownLabel(w2<span class="op">.</span>to_owned()))<span class="op">?;</span></span></code></pre></div>
 <p>(We use <code>Option::ok_or</code> and <code>Option::ok_or_else</code> to replace <code>None</code>s with <code>Err</code>s. The former is suitable when the value to put in the <code>Err</code> is free to construct, whereas the latter takes a closure to construct the error value, so that we can avoid doing so unless we actually need it.)</p>
 <p>What about passing on errors that aren’t ours, though—in this case, is there a way to call an operation that might produce an <code>io::Error</code> and then gracefully convert the <code>io::Error</code> into a <code>GraphError</code>? Well, doing the mapping manually isn’t totally awful:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">while</span> line_result <span class="op">=</span> buf_read<span class="op">.</span>lines() <span class="op">{</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">for</span> line_result <span class="kw">in</span> buf_read<span class="op">.</span>lines() <span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    <span class="kw">let</span> line <span class="op">=</span> line_result<span class="op">.</span>map_err(<span class="pp">GraphError::</span>IoError)<span class="op">?;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    …</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
@@ -129,7 +129,7 @@
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="op">}</span> </span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 <p>And here’s how we use it now:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">while</span> line_result <span class="op">=</span> buf_read<span class="op">.</span>lines() <span class="op">{</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">for</span> line_result <span class="kw">in</span> buf_read<span class="op">.</span>lines() <span class="op">{</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>    <span class="kw">let</span> line <span class="op">=</span> line_result<span class="op">?;</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    …</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>

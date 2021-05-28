@@ -29,7 +29,7 @@ pub enum GraphError {
 If we want to generate these errors ourselves, that’s easy:
 
 ```rust
-let w1  = query_words.next()
+let w1 = query_words.next()
     .ok_or(GraphError::QueryTooShort)?;
 let w2 = query_words.next()
     .ok_or(GraphError::QueryTooShort)?;
@@ -37,9 +37,9 @@ if query_words.next().is_some() {
     return Err(GraphError::QueryTooLong);
 }
 
-let src    = label_map.get_index(w1)
+let src = label_map.get_index(w1)
     .ok_or_else(|| GraphError::UnknownLabel(w1.to_owned()))?;
-let dst    = label_map.get_index(w2)
+let dst = label_map.get_index(w2)
     .ok_or_else(|| GraphError::UnknownLabel(w2.to_owned()))?;
 ```
 
@@ -48,7 +48,7 @@ let dst    = label_map.get_index(w2)
 What about passing on errors that aren’t ours, though—in this case, is there a way to call an operation that might produce an `io::Error` and then gracefully convert the `io::Error` into a `GraphError`? Well, doing the mapping manually isn’t totally awful:
 
 ```rust
-while line_result = buf_read.lines() {
+for line_result in buf_read.lines() {
     let line = line_result.map_err(GraphError::IoError)?;
     …
 }
@@ -67,12 +67,11 @@ impl From<std::io::IoError> for GraphError {
 And here’s how we use it now:
 
 ```rust
-while line_result = buf_read.lines() {
+for line_result in buf_read.lines() {
     let line = line_result?;
     …
 }
 ```
-
 
 ----
 
