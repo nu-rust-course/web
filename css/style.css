@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100;0,300;0,400;0,500;1,100;1,300;1,400;1,500&family=Roboto:ital,wght@0,100;0,300;0,400;0,700;1,100;1,300;1,400;1,700&display=swap');
+
+body {
+  font: 400 12pt/160% "Roboto",sans-serif;
+  width: 40pc;
+  margin: 1em auto;
+}
+
+code {
+  font: 400 100%/130% "Roboto Mono",monospace;
+}
+
+pre {
+  padding-left: 2em;
+}
+
+pre, pre code {
+  font: 300 11pt/15pt "Roboto Mono",monospace;
+}
+
+pre code span.cn, pre code span.dt {
+  font-weight: 400;
+}
+
+pre code span.kw {
+  font-weight: 500;
+}
+
+h1 {
+  font: 100 360%/100% "Roboto",sans-serif;
+}
+
+h2 {
+  font: 100 240%/100% "Roboto",sans-serif;
+}
+
+h1 code, h2 code {
+  font-weight: 100;
+}
+
+h3, h4 {
+  font-weight: 300;
+}
+
+h3 code, h4 code {
+  font-weight: 300;
+}
+
+h5, h6 {
+  font-weight: 400;
+}
+
+h5 code, h6 code {
+  font-weight: 400;
+}
+
+a {
+  color: #C60;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #C60;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: #842;
+}
+
+hr {
+  border: 1px solid #9608;
+  background: #C609;
+  height: 1em;
+  width: 1em;
+}

@@ -1,4 +1,6 @@
-## Define an error type that includes the errors you care about
+---
+title: Define an error type that includes the errors you care about
+---
 
 Strings are not a good way to communicate many kinds of errors, both because they require parsing to extract information, and because they’re expensive. It’s better to define an error type that lets you express exactly the situations you care about in a way that’s easy to work with downstream.
 
@@ -71,3 +73,7 @@ while line_result = buf_read.lines() {
 }
 ```
 
+
+----
+
+[Contents](index.html)

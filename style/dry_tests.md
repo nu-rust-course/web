@@ -1,4 +1,6 @@
-## Don’t repeat yourself in tests
+---
+title: Don’t repeat yourself in tests
+---
 
 Setting up for tests—creating the objects for testing and the expected results— can be repetitive:
 
@@ -55,3 +57,7 @@ fn count_five_words() {
 ```
 
 Defining `count_five_words` is left as an exercise for the reader.
+
+----
+
+[Contents](index.html)

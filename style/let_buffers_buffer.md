@@ -1,4 +1,6 @@
-## Don’t “double buffer” your text formatting output
+---
+title: Don’t “double buffer” your text formatting output
+---
 
 When you need to produce output in several pieces, don’t assemble your output in a string. That amounts to doing your own ad-hoc output buffering on top of the buffering that the output stream should already by doing <a name="back-1"></a>\[[1]]. Instead, write to the output stream piece by piece and avoid creating intermediate strings that 1) you don’t need and 2) make your code more complicated.
  
@@ -71,7 +73,7 @@ fn use_it(mut out: impl io::Write, p: &P2) -> io::Result<()> {
 
 If you don’t have your own type already then you might find it worth making one. I’ll show an example of this technique at the end.
 
-### Loops
+## Loops
 
 Sometimes not everything you want to format can be done in all one `write!`. For example, sometimes you need a loop. But that still doesn’t mean you should create a temporary `String`. Here’s an example:
 
@@ -185,3 +187,7 @@ Note that if the items are more complex than `&str`s then you may want to wrap t
 \[<a name="note-1">1</a>] Except in some special cases, you want your output streams to be buffered, and sometimes you have to arrange for this yourself. In particular, a locked standard input (`std::io::StdinLock`) is automatically buffered, and when a tests writes to a vector, that *is* a buffer. But when you’re going to write to a file or a socket, you need to wrap it in `std::io::BufWriter` yourself. If you don’t, output is likely to be quite slow, regardless of the advice in this note. \[[back](#back-1)]
 
 [1]: <#note-1>
+
+----
+
+[Contents](index.html)

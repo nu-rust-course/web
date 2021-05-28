@@ -1,4 +1,6 @@
-## If producing a sequence in order, return an iterator
+---
+title: If producing a sequence in order, return an iterator
+---
 
 A function that produces a sequence should often return an iterator rather than collecting the sequence into a vector. For example, consider this function for producing a sequence of the first `n` multiples of `m`:
 
@@ -97,3 +99,7 @@ impl ExactSizeIterator for Multiples {
 
 [`Iterator::map`]:
     https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.map
+
+----
+
+[Contents](index.html)

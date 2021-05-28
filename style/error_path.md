@@ -1,4 +1,6 @@
-## Don’t let error handling obscure the point
+---
+title: Don’t let error handling obscure the point
+---
 
 It’s not really nice when error handling causes the rest of the non-error code path to be nested and indented. Good error handling stays out of the way and emphasizes what the code is trying to accomplish in the successful case. And what would happen if this code had to deal with possible errors in two or three more places?
 
@@ -24,3 +26,7 @@ if ‹error_condition› {
 Ok(‹non_error_result›)
 ```
 
+
+----
+
+[Contents](index.html)

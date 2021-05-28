@@ -1,0 +1,5 @@
+MDS     = $(wildcard *.md)
+HTMLS   = $(MDS:%.md=%.html)
+
+%.html: %.md
+	pandoc --standalone --css=style.css --output=$@ $<

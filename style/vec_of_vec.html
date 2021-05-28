@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Systems Programming in Rust</title>
+  <title>Avoid extra indirections in multidimensional arrays</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -21,11 +21,11 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">Systems Programming in Rust</h1>
+<h1 class="title">Avoid extra indirections in multidimensional arrays</h1>
 </header>
-<ul>
-<li><p><a href="style/index.html">Rust style</a></p></li>
-<li><p><a href="project-presentations.html">Final project schedule</a></p></li>
-</ul>
+<p>A <code>Vec&lt;Vec&lt;T&gt;&gt;</code> is not the best way to represent a 2-D array or matrix. That type is useful when you need to be able to have rows of different lengths, or you need to resize rows or add or remove them. But for an <code>m</code>-by-<code>n</code> rectangle that doesn’t change size, a <code>Vec&lt;T&gt;</code> of size <code>m * n</code> is more efficient.</p>
+<p>(And for the special case of symmetric matrix, a size-<code>n * (n + 1) / 2</code> vector is even better.)</p>
+<hr />
+<p><a href="index.html">Contents</a></p>
 </body>
 </html>
