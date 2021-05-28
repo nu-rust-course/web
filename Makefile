@@ -1,11 +1,7 @@
 include MarkdownMakefile
 
 .PHONY: all
-all: html style
+all: html
 
 .PHONY: html
 html: $(HTMLS)
-
-.PHONY: style
-style:
-	make -C style
