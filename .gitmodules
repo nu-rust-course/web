@@ -1,0 +1,4 @@
+[submodule "html"]
+	path = html
+	url = git@github.com:nu-rust-course/web.git
+	branch = ghpages

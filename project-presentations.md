@@ -25,4 +25,4 @@ title: Final Project Plan
 
 ----
 
-[Home](index.html)
+[Home](./)
