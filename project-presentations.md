@@ -9,8 +9,6 @@ title: Final Project Plan
  3. Implementation:
      - Please prepare your code on slides or in some notes -- please don’t show it in your IDE or on GitHub.
 
-----
-
 ## Presentation schedule
 
 | Day | Start | Stop  | Group                 | Members                       |
