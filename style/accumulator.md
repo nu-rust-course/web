@@ -18,9 +18,9 @@ struct Node {
 fn quadratic_walk(tree: &Tree) -> Vec<usize> {
     let mut result = Vec::new();
     if let Some(node_ptr) = tree {
-        result.extend(quadratic_flatten(&node.left));
+        result.extend(quadratic_walk(&node.left));
         result.push(node.data);
-        result.extend(quadratic_flatten(&node.right));
+        result.extend(quadratic_walk(&node.right));
     }
     result
 }
