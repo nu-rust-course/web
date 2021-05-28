@@ -9,6 +9,8 @@ title: Final Project Plan
  3. Implementation:
      - Please prepare your code on slides or in some notes -- please don’t show it in your IDE or on GitHub.
 
+----
+
 ## Presentation schedule
 
 | Day | Start | Stop  | Group                 | Members                       |
@@ -22,3 +24,7 @@ title: Final Project Plan
 |     | 11:33 | 11:53 | Mini Bitcoin          | Fardeem, Radin, Rohith, Yibo  |
 |     | 11:53 | 12:01 | Web Crawler           | Xi                            |
 |     | 12:01 | 12:17 | HTTP Live Streaming   | Aarij, Zev, Neil              |
+
+----
+
+[Home](index.html)
